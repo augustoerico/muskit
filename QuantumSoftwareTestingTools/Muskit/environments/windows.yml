@@ -43,14 +43,14 @@ dependencies:
     - psutil==5.8.0
     - pybind11==2.6.2
     - pycparser==2.20
-    - pyinstaller==4.3
-    - pyinstaller-hooks-contrib==2021.1
+    - pyinstaller
+    - pyinstaller-hooks-contrib
     - pyrsistent==0.17.3
     - pysimplegui==4.43.0
     - python-constraint==1.4.0
     - python-dateutil==2.8.1
     - pytz==2021.1
-    - pywin32-ctypes==0.2.0
+    - pywin32-ctypes
     - qiskit==0.26.2
     - qiskit-aer==0.8.2
     - qiskit-aqua==0.9.1
