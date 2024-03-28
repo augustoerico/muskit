@@ -27,6 +27,7 @@ dependencies:
     - future==0.18.2
     - h5py==3.1.0
     - idna==2.10
+    - importlib-metadata==7.1.0
     - inflection==0.5.1
     - joblib==1.0.1
     - jsonschema==3.2.0
@@ -37,20 +38,21 @@ dependencies:
     - nest-asyncio==1.5.1
     - ntlm-auth==1.5.0
     - numpy==1.20.1
+    - packaging==24.0
     - pandas==1.2.3
     - pefile==2021.5.24
     - ply==3.11
     - psutil==5.8.0
     - pybind11==2.6.2
     - pycparser==2.20
-    - pyinstaller
-    - pyinstaller-hooks-contrib
+    - pyinstaller==5.1
+    - pyinstaller-hooks-contrib==2024.3
     - pyrsistent==0.17.3
     - pysimplegui==4.43.0
     - python-constraint==1.4.0
     - python-dateutil==2.8.1
     - pytz==2021.1
-    - pywin32-ctypes
+    - pywin32-ctypes==0.2.2
     - qiskit==0.26.2
     - qiskit-aer==0.8.2
     - qiskit-aqua==0.9.1
