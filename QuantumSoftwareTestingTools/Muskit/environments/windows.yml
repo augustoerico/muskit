@@ -1,4 +1,4 @@
-name: Muskit
+name: muskit-env
 channels:
   - defaults
 dependencies:
