@@ -1,7 +1,11 @@
-import QuantumGates
-import random
+"""
+Module for project core functionalities
+"""
 import os
 import platform
+import random
+
+import QuantumGates
 
 
 def createMutants(maxNum, operators, types, gateIDs, locationIDs, originPath, savePath, all, phases):

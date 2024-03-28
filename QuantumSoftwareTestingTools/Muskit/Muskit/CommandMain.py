@@ -1,7 +1,10 @@
+"""
+Module for command line operation
+"""
+import math
 
 import sys
 import functionalities
-import math
 
 
 mode = str(sys.argv[1])
