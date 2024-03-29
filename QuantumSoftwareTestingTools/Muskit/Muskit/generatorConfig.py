@@ -2,7 +2,7 @@
 Mutants Generator Configuration Variables
 """
 maxNumberOfMutants = 100 # Maximum number of mutants to be generated
-operators = ("Add","Replace") # Type of operators to be use to create mutants. Valid values are Add, Replace, Remove
+operators = ("Add","Replace","Remove") # Type of operators to be use to create mutants. Valid values are Add, Replace, Remove
 types = ("OneQubit",) # Types of gates the mutation will change, Valid values are OneQubit and ManyQubit
 gateNum = (1,3) # Gate number to be replaced and removed.
 location = (1, 5) # Location number of the gaps that will be used to add gates.
