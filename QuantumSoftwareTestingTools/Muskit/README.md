@@ -38,6 +38,19 @@ By default, the mutants are generated in the `Example` folder
 python Muskit/CommandMain.py Execute Muskit/executorConfig.py Muskit/testCases.py Example/AddMutations/10AddGate_ry_inGap_1_.py
 ```
 
+## Run the results analyser
+
+Once you execute the mutants, run the analyser to compare the mutant results with the program specification:
+
+```shell
+python resultsAnalyzer/main.py
+```
+
+You will have to input:
+1. the mutant results file (e.g. `Example/AddMutations/results.txt`)
+2. the expected results file (e.g. `Èxample/QR_program_specification.txt`)
+3. the folder to save the analyser output
+
 # Architecture of Muskit
 
 
