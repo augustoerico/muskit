@@ -20,6 +20,16 @@ In case of trouble setting up the environment, try updating the dependencies by 
 conda env update --file environments/{your-os}.yml --prune
 ```
 
+# Usage
+
+Assumming the working directory is `QuantumSoftwareTestingTool`.
+
+## Create mutants
+
+```shell
+python Muskit/CommandMain.py Create Muskit/generatorConfig.py Example/QRAM_program.py
+```
+
 # Architecture of Muskit
 
 
