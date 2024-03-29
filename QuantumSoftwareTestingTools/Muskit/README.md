@@ -22,12 +22,20 @@ conda env update --file environments/{your-os}.yml --prune
 
 # Usage
 
-Assumming the working directory is `QuantumSoftwareTestingTool`.
+Assumming the working directory is `QuantumSoftwareTestingTool/Muskit`.
 
 ## Create mutants
 
 ```shell
 python Muskit/CommandMain.py Create Muskit/generatorConfig.py Example/QRAM_program.py
+```
+
+## Execute mutants
+
+By default, the mutants are generated in the `Example` folder
+
+```shell
+python Muskit/CommandMain.py Execute Muskit/executorConfig.py Muskit/testCases.py Example/AddMutations/10AddGate_ry_inGap_1_.py
 ```
 
 # Architecture of Muskit
