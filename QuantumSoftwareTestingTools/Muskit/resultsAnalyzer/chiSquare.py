@@ -1,4 +1,3 @@
-from tkinter.filedialog import askopenfilename, askdirectory
 import math
 from scipy.stats import chisquare
 import analizerConfig as conf
