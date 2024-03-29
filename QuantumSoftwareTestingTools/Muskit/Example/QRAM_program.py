@@ -1,6 +1,8 @@
+"""
+Quantum Random Access Memory circuit
+"""
 import math
-import qiskit
-from qiskit import *
+from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
 
 
 q = QuantumRegister(7, 'q')
@@ -16,5 +18,3 @@ qc.swap(q[0],q[3])
 qc.swap(q[1],q[4])
 qc.cx(q[0],q[1])
 qc.x(q[0])
-
-
