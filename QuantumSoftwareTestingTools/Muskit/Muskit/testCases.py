@@ -1,4 +1,4 @@
 """
 Specify test cases in this format
 """
-inputs = ("001","101","110") #Inputs
+inputs = ("0000001","0000101","0000110") # inputs should not have spaces
