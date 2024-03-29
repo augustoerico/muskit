@@ -2,8 +2,7 @@
 Quantum Random Access Memory circuit
 """
 import math
-from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
-
+from qiskit import *
 
 q = QuantumRegister(7, 'q')
 c = ClassicalRegister(7, 'c')
