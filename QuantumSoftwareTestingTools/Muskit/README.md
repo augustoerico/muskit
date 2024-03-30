@@ -31,6 +31,16 @@ Assumming the working directory is `QuantumSoftwareTestingTool/Muskit`.
 ## Create mutants
 
 ```shell
+python Muskit/command_main.py create --config Muskit/configs/default.create.toml --circuit Example/QRAM_program.py
+``` 
+
+# Usage (Legacy)
+
+Assumming the working directory is `QuantumSoftwareTestingTool/Muskit`.
+
+## Create mutants
+
+```shell
 python Muskit/CommandMain.py Create Muskit/generatorConfig.py Example/QRAM_program.py
 ```
 
