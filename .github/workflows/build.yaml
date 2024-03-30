@@ -25,4 +25,5 @@ jobs:
       - name: Activate Environment
         run: conda activate muskit-env
       - name: Run tests
-        run: pytest
+        run: |
+          python -m pytest
