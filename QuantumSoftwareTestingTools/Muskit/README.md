@@ -2,10 +2,56 @@
 
 <img src="https://github.com/EnautMendi/QuantumMutationQiskit/blob/master/images/logoblue.png" width="200">
 
+![Build](https://github.com/augustoerico/muskit/actions/workflows/build.yaml/badge.svg)
+
 # Description
 Quantum software testing is a new area of research. Thus, there is a lack of benchmark programs and bugs repositories to assess the effectiveness of testing techniques. To this end, the quantum mutation analysis focuses on systematically generating a set of faulty versions of quantum programs, called mutants, using mutation operators. Such faulty versions of quantum programs can be used as benchmarks to assess the quality of test cases in a test suite. Here, we host a tool called Muskit -- a quantum mutation analysis tool for quantum programs coded in IBM's Qiskit language. Muskit implements a set of mutation operators on gates of quantum programs and a set of selection criteria to reduce the number of mutants to generate. Moreover, Muskit allows for the execution of test cases on mutants and generation of test results. Muskit is provided as a command line application, a GUI application, and also as a web application. 
 
+# Project Setup
 
+Create and activate the project Conda Environment based on your OS
+```shell
+conda env create -f environments/{your-os}.yml
+conda activate muskit-env
+```
+
+## Troubleshoot
+
+In case of trouble setting up the environment, try updating the dependencies by typing:
+```shell
+conda env update --file environments/{your-os}.yml --prune
+```
+
+# Usage
+
+Assumming the working directory is `QuantumSoftwareTestingTool/Muskit`.
+
+## Create mutants
+
+```shell
+python Muskit/CommandMain.py Create Muskit/generatorConfig.py Example/QRAM_program.py
+```
+
+## Execute mutants
+
+By default, the mutants are generated in the `Example` folder
+
+```shell
+python Muskit/CommandMain.py Execute Muskit/executorConfig.py Muskit/testCases.py Example/AddMutations/10AddGate_ry_inGap_1_.py
+```
+
+## Run the results analyser
+
+Once you execute the mutants, run the analyser to compare the mutant results with the program specification:
+
+```shell
+python resultsAnalyzer/main.py
+```
+
+You will have to input:
+1. the mutant results file (e.g. `Example/AddMutations/results.txt`)
+2. the expected results file (e.g. `Èxample/QR_program_specification.txt`)
+3. the folder to save the analyser output
 
 # Architecture of Muskit
 

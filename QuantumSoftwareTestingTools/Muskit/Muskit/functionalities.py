@@ -127,6 +127,7 @@ def executeMutants(files, resultPath, numShots, allInputs, inputs):
                     g.write("\n")
                     z=1
                     while z <= len(init):
+                        # adds a x gate to initialize qubit in |1>
                         if init[z-1]=="1":
                             g.write(str(CircuitName) + ".x(" + str(QubitName) + "[" + str(QubitNum-z) + "])")
                             g.write("\n")
@@ -138,7 +139,7 @@ def executeMutants(files, resultPath, numShots, allInputs, inputs):
                     str(CircuitName) + ".measure(" + str(QubitName) + "[" + str(y) + "], " + str(ClassicName) + "[" + str(y) + "])")
                 g.write("\n")
                 y = y + 1
-            g.write("simulator = Aer.get_backend('qasm_simulator')")
+            g.write("simulator = Aer.get_backend('qasm_simulator')") # Aer to be replaced with AerSimulator
             g.write("\n")
             g.write("job = execute(" + str(CircuitName) + ", simulator, shots=" + str(numShots) + ")")  ##execute for 10 times
             g.write("\n")
@@ -154,7 +155,7 @@ def executeMutants(files, resultPath, numShots, allInputs, inputs):
             g.write("\n")
             g.write("r.write(r" + chr(34)+ "The result of " + files[x] + " with input [" + str(init) +"] is: " + chr(34) + " + str(counts))")
             g.write("\n")
-            g.write("r.write(r"+ chr(34) + chr(92) + "n"+ chr(34)+")")
+            g.write("r.write("+ chr(34) + chr(92) + "n"+ chr(34)+")")
             g.write("\n")
             g.write("r.close()")
             f.close()

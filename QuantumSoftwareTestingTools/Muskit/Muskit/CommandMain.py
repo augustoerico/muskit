@@ -6,11 +6,10 @@ import math
 import sys
 import functionalities
 
-
 mode = str(sys.argv[1])
 
 if mode == "Execute":
-    importfile = str(sys.argv[2])
+    importfile = str(sys.argv[2]) # executor_config.py
     f = open(importfile)
     line = f.readline()
     while line != "":
@@ -29,7 +28,7 @@ if mode == "Execute":
         line = f.readline()
     f.close()
 
-    importfile = str(sys.argv[3])
+    importfile = str(sys.argv[3]) # test_cases.py
     f = open(importfile)
     line = f.readline()
     while line != "":
@@ -46,7 +45,7 @@ if mode == "Execute":
                 inputs.append(str(x[1:len(x)-1]))
         line = f.readline()
     f.close()
-    files = sys.argv[4:len(sys.argv)]
+    files = sys.argv[4:len(sys.argv)] # Quantum Circuit files
     splitChar = "\\"
     if splitChar not in files[0]:
         splitChar = chr(47)
@@ -59,7 +58,7 @@ if mode == "Execute":
     functionalities.executeMutants(files, savePath, numShots, allInputs, inputs)
 elif mode == "Create":
 
-    importfile = str(sys.argv[2])
+    importfile = str(sys.argv[2]) # generator_config.py
     f = open(importfile)
     line = f.readline()
     while line != "":
@@ -117,7 +116,7 @@ elif mode == "Create":
         line = f.readline()
     f.close()
 
-    file = str(sys.argv[3])
+    file = str(sys.argv[3]) # Quantum Circuit file
 
     splitChar = 92
     if chr(splitChar) not in file:
