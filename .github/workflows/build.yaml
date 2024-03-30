@@ -24,3 +24,5 @@ jobs:
         run: conda env create --file env.yml
       - name: Activate Environment
         run: conda activate muskit-env
+      - name: Run tests
+        run: pytest
