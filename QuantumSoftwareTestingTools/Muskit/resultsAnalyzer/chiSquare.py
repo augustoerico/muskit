@@ -1,4 +1,5 @@
 import math
+from datetime import datetime
 from scipy.stats import chisquare
 import analizerConfig as conf
 
@@ -14,6 +15,7 @@ def validation(observedFile, expectedFile):
     ef = open(expectedFile, "r+")
     of = open(observedFile, "r+")
     g = open((saveDirectory), "w")
+    g.write(f'-> {datetime.now().isoformat()}\n')
     num = "0,1,2,3,4,5,6,7,8,9"
     expectedDic = {"": []}
     observedDic = {"": []}
@@ -119,4 +121,6 @@ def validation(observedFile, expectedFile):
                 first = False
             filename = x.split(".py")
             observedDic.clear()
+    g.write(f'<- {datetime.now().isoformat()}\n')
+    g.close()
     return
