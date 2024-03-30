@@ -26,4 +26,5 @@ jobs:
         run: conda activate muskit-env
       - name: Run tests
         run: |
-          python -m pytest
+          pip install pytest
+          pytest
