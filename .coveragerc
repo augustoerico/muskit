@@ -1,0 +1,5 @@
+[run]
+branch = True
+source =
+    QuantumSoftwareTestingTools/Muskit/Muskit
+    QuantumSoftwareTestingTools/Muskit/resultsAnalyzer

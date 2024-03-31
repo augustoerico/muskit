@@ -22,7 +22,11 @@ jobs:
         run: |
           conda info
           conda list
-      - name: Run pytest
+      - name: Test and coverage
         shell: bash -l {0}
-        run: |
-            pytest
+        run: coverage run -m pytest
+      # - name: Upload coverage reports to Codecov
+      #   uses: codecov/codecov-action@v4.0.1
+      #   with:
+      #     token: ${{ secrets.CODECOV_TOKEN }}
+      #     slug: augustoerico/muskit

@@ -24,6 +24,20 @@ In case of trouble setting up the environment, try updating the dependencies by 
 conda env update --file environments/{your-os}.yml --prune
 ```
 
+## Test and Code Coverage 🚧[WIP]🚧
+
+Run tests with pytest and generate coverage file with CoveragePy: 
+```shell
+coverage run -m pytest
+```
+
+Running the test will create mutants for the provided example with default arguments.
+
+Generate HTML report (`htmlcov\index.html`):
+```shell
+coverage html
+```
+
 # Usage
 
 Assumming the working directory is `QuantumSoftwareTestingTool/Muskit`.
@@ -62,7 +76,7 @@ python resultsAnalyzer/main.py
 
 You will have to input:
 1. the mutant results file (e.g. `Example/AddMutations/results.txt`)
-2. the expected results file (e.g. `Èxample/QR_program_specification.txt`)
+2. the expected results file (e.g. `Example/QR_program_specification.txt`)
 3. the folder to save the analyser output
 
 # Architecture of Muskit
