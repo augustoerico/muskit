@@ -25,6 +25,7 @@ jobs:
       - name: Test and coverage
         shell: bash -l {0}
         run: |
+            ./cc-reporter before-build
             coverage run -m pytest
       - name: Report
         uses: paambaati/codeclimate-action@v5.0.0
