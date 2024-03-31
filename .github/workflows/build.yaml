@@ -24,10 +24,9 @@ jobs:
           conda list
       - name: Test and coverage
         shell: bash -l {0}
-        run: |
-            ./cc-reporter before-build
-            coverage run -m pytest
-      - name: Report
-        uses: paambaati/codeclimate-action@v5.0.0
-        env:
-          CC_TEST_REPORTER_ID: e7dfafffc33c648830c2c480f5ad4be136ac42fb6b6577fb19a7d015b4a8e3bc
+        run: coverage run -m pytest
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4.0.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: augustoerico/muskit
