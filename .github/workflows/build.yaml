@@ -26,3 +26,9 @@ jobs:
         shell: bash -l {0}
         run: |
             pytest
+      - name: Coverage
+        uses: paambaati/codeclimate-action@v2.2.4
+        env:
+          CC_TEST_REPORTER_ID: e7dfafffc33c648830c2c480f5ad4be136ac42fb6b6577fb19a7d015b4a8e3bc
+        with:
+          coverageCommand: coverage run -m pytest
