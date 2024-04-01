@@ -1,2 +1,4 @@
-# remove executor output from commits
+# remove execution output from commits
 results.txt
+cleanResults.txt
+testResults.txt
