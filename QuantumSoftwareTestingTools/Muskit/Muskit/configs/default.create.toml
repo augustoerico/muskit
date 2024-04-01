@@ -1,0 +1,22 @@
+# Mutants Creator Configuration Variables
+
+# Maximum number of mutants to be generated
+max_number_of_mutants = 100
+
+# Type of operators to be use to create mutants. Valid values are Add, Replace, Remove
+operators = [ "Add", "Replace", "Remove" ]
+
+# Types of gates the mutation will change, Valid values are OneQubit and ManyQubit
+types = [ "OneQubit" ]
+
+# Gate number to be replaced and removed
+gate_number = [ 1, 3 ]
+
+# Location number of the gaps that will be used to add gates
+location = [ 1, 5 ]
+
+# Phase degrees that will be used to select one value randomly. A valid value is between 0 and 360
+phases = [0, 90, 180, 270]
+
+# If this variable is true, then all the possible mutants will be generated
+all_mutants = false

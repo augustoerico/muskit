@@ -24,7 +24,91 @@ In case of trouble setting up the environment, try updating the dependencies by 
 conda env update --file environments/{your-os}.yml --prune
 ```
 
+## Test and Code Coverage 🚧[WIP]🚧
+
+Run tests with pytest and generate coverage file with CoveragePy: 
+```shell
+coverage run -m pytest
+```
+
+Running the test will create mutants for the provided example with default arguments.
+
+Generate HTML report (`htmlcov\index.html`):
+```shell
+coverage html
+```
+
 # Usage
+
+Assumming the working directory is `QuantumSoftwareTestingTool/Muskit`.
+
+## Help
+
+The Muskit CLI supports `--help` option
+```shell
+$ python Muskit/main.py --help
+
+Usage: main.py [OPTIONS] COMMAND [ARGS]...
+
+╭─ Options ──────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ --install-completion          Install completion for the current shell.                                                │
+│ --show-completion             Show completion for the current shell, to copy it or customize the installation.         │
+│ --help                        Show this message and exit.                                                              │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭─ Commands ─────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ create                                   create mutants                                                                │
+│ execute                                  execute mutants                                                               │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+```
+
+## Create mutants
+
+Creates mutants based on `circuit` and saves them into the same directory of `circuit` 
+
+```shell
+python Muskit/main.py create --config Muskit/configs/default.create.toml --circuit Example/QRAM_program.py
+```
+
+```shell
+$ python Muskit/main.py create --help
+
+ Usage: main.py create [OPTIONS]
+
+ create mutants
+
+╭─ Options ────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ *  --config         PATH  [default: None] [required]                                                                 │
+│ *  --circuit        PATH  [default: None] [required]                                                                 │
+│    --help                 Show this message and exit.                                                                │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+```
+
+## Execute mutants
+
+Execute mutants based on the provided `CIRCUITS` and saves a `result.txt` into the folder where the first circuit is located
+
+```shell
+$ python Muskit/main.py execute --config Muskit/configs/default.execute.toml --test-cases Muskit/configs/test.inputs.toml ExampleTest/1AddGate_x_inGap_1_.py ExampleTest/1ReplaceGate.py ExampleTest/RemoveGate_1_.py
+```
+
+```shell
+$ python Muskit/main.py execute --help
+
+ Usage: main.py execute [OPTIONS] CIRCUITS...
+
+ execute mutants
+
+╭─ Arguments ──────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ *    circuits      CIRCUITS...  [default: None] [required]                                                           │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭─ Options ────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ *  --config            PATH  [default: None] [required]                                                              │
+│ *  --test-cases        PATH  [default: None] [required]                                                              │
+│    --help                    Show this message and exit.                                                             │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+```
+
+# Usage (Legacy)
 
 Assumming the working directory is `QuantumSoftwareTestingTool/Muskit`.
 
@@ -36,10 +120,10 @@ python Muskit/CommandMain.py Create Muskit/generatorConfig.py Example/QRAM_progr
 
 ## Execute mutants
 
-By default, the mutants are generated in the `Example` folder
+By default, the mutants are generated in the folder where the circuits are located.
 
 ```shell
-python Muskit/CommandMain.py Execute Muskit/executorConfig.py Muskit/testCases.py Example/AddMutations/10AddGate_ry_inGap_1_.py
+python Muskit/CommandMain.py Execute Muskit/executorConfig.py Muskit/testCases.py ExampleTest/1AddGate_x_inGap_1_.py ExampleTest/1ReplaceGate.py ExampleTest/RemoveGate_1_.py
 ```
 
 ## Run the results analyser
@@ -52,7 +136,7 @@ python resultsAnalyzer/main.py
 
 You will have to input:
 1. the mutant results file (e.g. `Example/AddMutations/results.txt`)
-2. the expected results file (e.g. `Èxample/QR_program_specification.txt`)
+2. the expected results file (e.g. `Example/QR_program_specification.txt`)
 3. the folder to save the analyser output
 
 # Architecture of Muskit
