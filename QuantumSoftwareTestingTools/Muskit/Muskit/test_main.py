@@ -30,3 +30,23 @@ def test_should_create_mutants_with_default_inputs():
 
     # then
     assert result.exit_code == 0
+
+def test_should_execute_mutants_with_default_inputs():
+    """
+    test should execute mutants with default inputs
+        without raising an exception
+    """
+
+    # given
+    args = ["execute",
+            "--config", "configs/default.execute.toml",
+            "--test-cases", "configs/test.inputs.toml",
+            "../ExampleTest/1AddGate_x_inGap_1_.py",
+            "../ExampleTest/1ReplaceGate.py",
+            "../ExampleTest/RemoveGate_1_.py"]
+
+    # when
+    result = runner.invoke(app, args)
+
+    # then
+    assert result.exit_code == 0

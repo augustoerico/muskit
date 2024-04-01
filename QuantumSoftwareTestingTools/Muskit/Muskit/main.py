@@ -3,13 +3,15 @@ Muskit entry point
 """
 import os
 from pathlib import Path
+from typing import List
 
 from rich.console import Console
 import toml
 import typer
 from typing_extensions import Annotated
 
-from functionalities import createMutants as create_mutants
+from functionalities import createMutants as create_mutants \
+                            , executeMutants as execute_mutant
 
 app = typer.Typer()
 
@@ -46,16 +48,25 @@ def create(
 def execute(
     config: Annotated[Path, typer.Option(**typer_options)],
     test_cases: Annotated[Path, typer.Option(**typer_options)],
-    circuit: Annotated[Path, typer.Option(**typer_options)]
+    circuits: List[Path],
     ):
     """
     execute mutants
     """
-    # python Muskit/CommandMain.py Execute Muskit/executorConfig.py Muskit/testCases.py Example/AddMutations/10AddGate_ry_inGap_1_.py
-    print(f'opens: {config}')
-    print(f'opens: {test_cases}')
-    print(f'opens: {circuit}')
-    print('executing mutants')
+
+    config_options = toml.load(config)
+    inputs = toml.load(test_cases).get('inputs')
+    circuit_file_paths = [ str(c.absolute()) for c in circuits ]
+    # use the first file directory as output directory
+    save_dir = os.path.dirname(circuit_file_paths[0])
+
+    execute_mutant(
+        circuit_file_paths,
+        save_dir,
+        config_options.get('num_shots'),
+        config_options.get('all_inputs'),
+        inputs
+    )
 
 if __name__ == '__main__':
     app()

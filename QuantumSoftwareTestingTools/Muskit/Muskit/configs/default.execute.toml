@@ -1,0 +1,8 @@
+# Mutant Executor Configuration Variables
+
+# Number of shots or repeatition in each execution for each input
+num_shots = 100
+
+# If this variable os true then program will be executed with all possible inputs, i.e., All Input Coverage
+# otherwise, it uses the test.inputs.toml provided
+all_inputs = false
