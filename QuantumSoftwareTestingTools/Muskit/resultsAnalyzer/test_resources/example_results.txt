@@ -1,0 +1,9 @@
+The result of /some/valid/path/test_example/1AddGate_x_inGap_1_.py with input [0000001] is: {'0001101': 69, '0001001': 31}
+The result of /some/valid/path/test_example/1AddGate_x_inGap_1_.py with input [0000101] is: {'0001001': 76, '0001101': 24}
+The result of /some/valid/path/test_example/1AddGate_x_inGap_1_.py with input [0000110] is: {'0010001': 78, '0010101': 22}
+The result of /some/valid/path/test_example/1ReplaceGate.py with input [0000001] is: {'0001101': 58, '0001001': 42}
+The result of /some/valid/path/test_example/1ReplaceGate.py with input [0000101] is: {'0001101': 50, '0001001': 50}
+The result of /some/valid/path/test_example/1ReplaceGate.py with input [0000110] is: {'0010001': 49, '0010101': 51}
+The result of /some/valid/path/test_example/RemoveGate_1_.py with input [0000001] is: {'0001101': 52, '0001001': 48}
+The result of /some/valid/path/test_example/RemoveGate_1_.py with input [0000101] is: {'0001001': 48, '0001101': 52}
+The result of /some/valid/path/test_example/RemoveGate_1_.py with input [0000110] is: {'0010101': 47, '0010001': 53}
