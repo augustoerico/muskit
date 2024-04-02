@@ -12,7 +12,8 @@ def parse(file_path: Path) -> None:
     """
     parse results file into json data
     """
-    dump_options = { 'sort_keys': True, 'indent': 4 }
+    json_dump_options = { 'sort_keys': True, 'indent': 4 }
+
     counts_by_mutant_by_input = \
         break_results_into_smaller_sections(file_path)
 
@@ -25,7 +26,7 @@ def parse(file_path: Path) -> None:
         with open(
             f"{output_dir}/{results_file_name}.txt",
             'x', encoding='utf-8') as file:
-            json.dump(counts_by_input, fp=file, **dump_options)
+            json.dump(counts_by_input, fp=file, **json_dump_options)
 
 def break_results_into_smaller_sections(file_path: Path) -> dict:
     """
