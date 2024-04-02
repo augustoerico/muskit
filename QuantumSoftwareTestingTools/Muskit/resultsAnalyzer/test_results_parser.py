@@ -139,3 +139,18 @@ def test_should_break_results_file_into_smaller_sections():
             '0000110': { '0010001': 49, '0010101': 51 }
         }
     }
+
+def test_should_parse_results_file_into_json_file():
+    """
+    test should parse a valid results file into multiple results json files,
+        one for each mutant
+    """
+    # given
+    results_file_path = "test_resources/example_results.txt"
+
+    # when
+    results_parser.parse(results_file_path)
+
+    # then
+    assert True
+    # [TODO] make better assertions

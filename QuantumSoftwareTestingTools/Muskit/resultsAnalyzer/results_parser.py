@@ -2,14 +2,30 @@
 Module to parse results file produced by Muskit.execute
 """
 import ast
+import json
 from pathlib import Path
+from os import mkdir
+from os.path import basename, dirname
 
 
 def parse(file_path: Path) -> None:
     """
-    parse results file
+    parse results file into json data
     """
-    break_results_into_smaller_sections(file_path)
+    dump_options = { 'sort_keys': True, 'indent': 4 }
+    counts_by_mutant_by_input = \
+        break_results_into_smaller_sections(file_path)
+
+    output_dir = f"{dirname(file_path)}/json_results"
+    mkdir(output_dir)
+
+    for mutant_file_path, counts_by_input in counts_by_mutant_by_input.items():
+        results_file_name = str(basename(mutant_file_path)) \
+            .split('.', maxsplit=1)[0] # mutant file name without '.py' extension
+        with open(
+            f"{output_dir}/{results_file_name}.txt",
+            'x', encoding='utf-8') as file:
+            json.dump(counts_by_input, fp=file, **dump_options)
 
 def break_results_into_smaller_sections(file_path: Path) -> dict:
     """
