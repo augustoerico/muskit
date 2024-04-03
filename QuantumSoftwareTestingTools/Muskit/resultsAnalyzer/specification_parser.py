@@ -3,11 +3,11 @@ Module to parse the Quantum Program specification into a dictionary
 """
 from os.path import dirname, basename
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 import simplejson
 
-def parse(specification_file_path: Path, save_output: bool = True):
+def parse(specification_file_path: Path, n_qubits: Optional[int], save_output: bool = True):
     """
     parses the Quantum Program specification file into a dictionary
     """
@@ -22,7 +22,7 @@ def parse(specification_file_path: Path, save_output: bool = True):
                     output_probabilities_by_input
                     )
 
-    parsed = fix_number_of_bits(output_probabilities_by_input)
+    parsed = fix_number_of_bits(output_probabilities_by_input, n_qubits)
     if save_output:
         save_parsed_spec(specification_file_path, parsed)
     return parsed
@@ -37,19 +37,24 @@ def save_parsed_spec(specification_file_path: Path, output_probabilities_by_inpu
     with open(json_file_path, 'w', encoding='utf-8') as file:
         simplejson.dump(output_probabilities_by_input, fp=file, indent=4)
 
-def fix_number_of_bits(output_probabilities_by_input: dict):
+def fix_number_of_bits(output_probabilities_by_input: dict, n_qubits: Optional[int]):
     """
     add zeros to the left to match the highest bit counts
     """
-    max_lenght_of_bits = 0
-    for i in output_probabilities_by_input.keys():
-        lenght_of_bits = len(i)
-        if lenght_of_bits > max_lenght_of_bits:
-            max_lenght_of_bits = lenght_of_bits
+    max_n_qubits = 0
+    if not n_qubits:
+        # find the number of qubits from output probabilities
+        for i in output_probabilities_by_input.keys():
+            lenght_of_bits = len(i)
+            if lenght_of_bits > max_n_qubits:
+                max_n_qubits = lenght_of_bits
+    else:
+        max_n_qubits = n_qubits
+
     result = {}
     for i, op in output_probabilities_by_input.items():
-        result[i.zfill(max_lenght_of_bits)] = {
-            o.zfill(max_lenght_of_bits): p
+        result[i.zfill(max_n_qubits)] = {
+            o.zfill(max_n_qubits): p
             for o, p in op.items()
         }
     return result

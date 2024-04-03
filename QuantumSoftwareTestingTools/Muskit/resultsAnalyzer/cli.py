@@ -2,11 +2,13 @@
 CLI entry for analysing results
 """
 from pathlib import Path
+from typing import Optional
 
 import typer
 from typing_extensions import Annotated
 from rich.console import Console
 
+import op_oracle
 from results_parser import parse as r_parse
 from specification_parser import parse as s_parse
 
@@ -25,11 +27,24 @@ def parse_results(results: Annotated[Path, typer.Option(**typer_options)]):
     r_parse(results)
 
 @app.command()
-def parse_spec(spec: Annotated[Path, typer.Option(**typer_options)]):
+def parse_spec(
+    spec: Annotated[Path, typer.Option(**typer_options)],
+    n_qubits: Annotated[int, typer.Argument(min=1)],
+    save: Annotated[Optional[bool], typer.Argument()] = True
+    ):
     """
     parses a specification into JSON format
     """
-    s_parse(spec)
+    s_parse(spec, n_qubits, save)
+
+@app.command()
+def verify_opo(expected: Annotated[Path, typer.Option(**typer_options)],
+               observed: Annotated[Path, typer.Option(**typer_options)]):
+    """
+    Verify PARSED results obtained from Muskit.execute against the
+        PARSED program specification
+    """
+    op_oracle.verify(expected, observed, .01)
 
 # @app.command()
 # def verify_woo(
