@@ -33,7 +33,7 @@ def save_parsed_spec(specification_file_path: Path, output_probabilities_by_inpu
     """
     dir_name = dirname(specification_file_path)
     file_name = basename(specification_file_path).split('.', 1)[0]
-    json_file_path = f"{dir_name}/{file_name}.json"
+    json_file_path = f"{dir_name}/{file_name}.spec.json"
     with open(json_file_path, 'w', encoding='utf-8') as file:
         simplejson.dump(output_probabilities_by_input, fp=file, indent=4)
 
