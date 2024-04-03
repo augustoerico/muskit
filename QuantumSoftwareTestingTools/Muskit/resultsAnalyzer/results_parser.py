@@ -24,7 +24,7 @@ def parse(file_path: Path) -> None:
         results_file_name = str(basename(mutant_file_path)) \
             .split('.', maxsplit=1)[0] # mutant file name without '.py' extension
         with open(
-            f"{output_dir}/{results_file_name}.txt",
+            f"{output_dir}/{results_file_name}.json",
             'x', encoding='utf-8') as file:
             json.dump(counts_by_input, fp=file, **json_dump_options)
 
