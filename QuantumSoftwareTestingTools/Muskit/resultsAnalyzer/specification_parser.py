@@ -1,10 +1,13 @@
 """
 Module to parse the Quantum Program specification into a dictionary
 """
+from os.path import dirname, basename
 from pathlib import Path
 from typing import List, Tuple
 
-def parse(specification_file_path: Path):
+import simplejson
+
+def parse(specification_file_path: Path, save_output: bool = True):
     """
     parses the Quantum Program specification file into a dictionary
     """
@@ -18,7 +21,21 @@ def parse(specification_file_path: Path):
                     input_value, output, probability,
                     output_probabilities_by_input
                     )
-    return fix_number_of_bits(output_probabilities_by_input)
+
+    parsed = fix_number_of_bits(output_probabilities_by_input)
+    if save_output:
+        save_parsed_spec(specification_file_path, parsed)
+    return parsed
+
+def save_parsed_spec(specification_file_path: Path, output_probabilities_by_input: dict):
+    """
+    saves the output_probabilities_by_input dict into a JSON object
+    """
+    dir_name = dirname(specification_file_path)
+    file_name = basename(specification_file_path).split('.', 1)[0]
+    json_file_path = f"{dir_name}/{file_name}.json"
+    with open(json_file_path, 'w', encoding='utf-8') as file:
+        simplejson.dump(output_probabilities_by_input, fp=file, indent=4)
 
 def fix_number_of_bits(output_probabilities_by_input: dict):
     """
