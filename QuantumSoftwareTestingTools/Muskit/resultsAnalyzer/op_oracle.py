@@ -91,6 +91,7 @@ def save_wrong_outputs_by_input(
     """
     Save Wrong Outputs list by a given input
     """
-    file_name = f"{dirname(observed_results_file_path)}/{basename(observed_results_file_path.stem)}.woo.json"
+    file_name = f"{dirname(observed_results_file_path)}" \
+        + "/{basename(observed_results_file_path.stem)}.woo.json"
     with open(file_name, 'w', encoding="utf-8") as file:
         simplejson.dump(wrong_outputs, file, indent=4)
