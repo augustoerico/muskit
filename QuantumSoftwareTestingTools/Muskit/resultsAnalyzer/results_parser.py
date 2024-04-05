@@ -66,7 +66,7 @@ def extract_mutant_path(line: str) -> str:
     extracts mutant file path
     """
     prefix = "The result of "
-    suffix = " with input "
+    suffix = " with input 12345"
     i_suffix = line.find(suffix)
     return line[len(prefix):i_suffix]
 
@@ -79,4 +79,3 @@ def extract_counts_by_input(line: str) -> dict:
     counts_start, counts_end = line.find("{"), line.find("}")
     counts = ast.literal_eval(line[counts_start: counts_end + 1])
     return { input_value: counts }
-  
