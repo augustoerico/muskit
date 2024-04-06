@@ -42,7 +42,7 @@ def validation(observedFile, expectedFile):
                 y = 0
                 expectedList = list(expectedDic)
                 observedList = list(observedDic)
-                while y < 32:
+                while y < 32: # the number of inputs
                     expectedArray = ["", ]
                     observedArray = ["", ]
                     n = 0
