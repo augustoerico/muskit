@@ -19,12 +19,19 @@ def verify(
         observed_outputs_counts_by_input = simplejson.load(file)
     with open(expected_outputs_by_input_file_path, 'r', encoding='utf-8') as file:
         expected_outputs_probabilities_by_input = simplejson.load(file)
-    
-    # observed_outputs_by_input = \
-    #     add_zero_count_for_non_observed_outputs(
-    #         observed_outputs_by_input,
-    #         expected_outputs_probabilities_by_input
-    #     )
+
+    observed_outputs_counts_by_input = \
+        add_zero_count_for_non_observed_outputs(
+            observed_outputs_counts_by_input,
+            expected_outputs_probabilities_by_input
+        )
+    total_counts_by_input = get_total_counts_by_input(
+        observed_outputs_counts_by_input)
+    expected_outputs_counts_by_input = \
+        get_expected_outputs_counts_by_input(
+            expected_outputs_probabilities_by_input,
+            total_counts_by_input
+        )
     # results, wrong_outputs = calculate_chisquare_for_each_input(
     #     observed_outputs_counts_by_input,
     #     expected_outputs_probabilities_by_input)
@@ -40,6 +47,36 @@ def verify(
     # if len(wrong_outputs) > 0:
     #     save_wrong_outputs_by_input(wrong_outputs, observed_outputs_by_input_file_path)
     # save_results(results, observed_results_file_path)
+
+def get_expected_outputs_counts_by_input(
+        expected_outputs_probabilities_by_input: dict,
+        total_counts_by_input
+        ) -> dict:
+    """
+    returns the expected outputs counts for each input, given
+        the total counts of observed outputs for each input
+    """
+    return {
+        input_value: \
+            get_expected_outputs_counts(
+                expected_outputs_probabilities,
+                total_counts_by_input[input_value])
+        for input_value, expected_outputs_probabilities in \
+            expected_outputs_probabilities_by_input.items()
+    }
+
+def get_expected_outputs_counts(
+        expected_outputs_probabilities: dict,
+        total_counts: int
+        ) -> dict:
+    """
+    returns the expected output counts given a total counts
+    """
+    return {
+        output: round(probability * total_counts)
+        for output, probability in \
+            expected_outputs_probabilities.items()
+    }
 
 def add_zero_count_for_non_observed_outputs_by_input(
         observed_outputs_counts_by_input: dict,
@@ -71,22 +108,30 @@ def add_zero_count_for_non_observed_outputs(
             observed_outputs_counts[output] = 0
     return observed_outputs_counts
 
-def calculate_chisquare_for_each_input(
-        observed_outputs_counts_by_input: dict,
-        expected_outputs_probabilities_by_input: dict
-        ) -> Tuple[dict, List]:
+# def calculate_chisquare_for_each_input(
+#         observed_outputs_counts_by_input: dict,
+#         expected_outputs_probabilities_by_input: dict
+#         ) -> Tuple[dict, List]:
+#     """
+#     calculate the chi-square for each input
+#     """
+#     wrong_outputs = [] # observed output that is not expected
+#     for input_value, observed_outputs_counts in \
+#         observed_outputs_counts_by_input.items():
+#         total_counts = get_total_counts(observed_outputs_counts)
+
+#         # get_expected_output(expected_outputs_probabilities, total_counts)
+
+def get_total_counts_by_input(
+        observed_outputs_counts_by_input: dict) -> int:
     """
-    calculate the chi-square for each input
+    get total counts from an observed outputs
     """
-    wrong_outputs = [] # observed output that is not expected
+    total_counts_by_input = {}
     for input_value, observed_outputs_counts in \
         observed_outputs_counts_by_input.items():
-        total_counts = get_total_counts(observed_outputs_counts)
-
-        # get_expected_output(expected_outputs_probabilities, total_counts)
-
-def get_total_counts(observed_outputs_counts: dict) -> int:
-    return sum(observed_outputs_counts.values())
+        total_counts_by_input[input_value] = sum(observed_outputs_counts.values())
+    return total_counts_by_input
 
 def save_wrong_outputs_by_input(
         wrong_outputs: List[dict],
