@@ -16,9 +16,18 @@ def verify(
     Verifies expected results against actual results for a given input
     """
     with open(observed_outputs_by_input_file_path, 'r', encoding='utf-8') as file:
-        observed_outputs_by_input = simplejson.load(file)
+        observed_outputs_counts_by_input = simplejson.load(file)
     with open(expected_outputs_by_input_file_path, 'r', encoding='utf-8') as file:
-        expected_outputs_by_input = simplejson.load(file)
+        expected_outputs_probabilities_by_input = simplejson.load(file)
+    
+    # observed_outputs_by_input = \
+    #     add_zero_count_for_non_observed_outputs(
+    #         observed_outputs_by_input,
+    #         expected_outputs_probabilities_by_input
+    #     )
+    # results, wrong_outputs = calculate_chisquare_for_each_input(
+    #     observed_outputs_counts_by_input,
+    #     expected_outputs_probabilities_by_input)
 
     # wrong_outputs = []
     # expected_outputs_by_input = expected_outputs_by_input.get(input_value) # |
@@ -27,70 +36,57 @@ def verify(
     #         wrong_outputs = [
     #             *wrong_outputs,
     #             { "input": input_value, "outputs": observed_outputs_counts }
-    #         ]
-    total_observed_output_counts, total = \
-        get_total_observed_output_counts(observed_outputs_by_input)
-    total_expected_output_counts = \
-        get_total_expected_output_counts(expected_outputs_by_input, total)
-
-        # else:
-        #     r = calculate_chi_square(
-        #         expected_results[input_value], # |
-        #             # KeyError here means we've got an unspecified output
-        #             # should raise WOO
-        #         observed_results_counts
-        #     )
-        #     statistic, pvalue = r
-        #     results = [
-        #         *results, {
-        #             "statistic": statistic,
-        #             "pvalue": pvalue,
-        #             "input": input_value
-        #             } ]
+    #
     # if len(wrong_outputs) > 0:
     #     save_wrong_outputs_by_input(wrong_outputs, observed_outputs_by_input_file_path)
     # save_results(results, observed_results_file_path)
 
-def get_total_observed_output_counts(
-        observed_outputs_by_input: dict
-        ) -> Tuple[dict, int]:
+def add_zero_count_for_non_observed_outputs_by_input(
+        observed_outputs_counts_by_input: dict,
+        expected_outputs_probabilities_by_input: dict) -> dict:
     """
-    returns the total output counts considering all inputs
+    adds 0 counts when the output is not observed, but is expected
     """
-    total_observed_output_counts = {}
-    total = 0
-    for observed_outputs_counts in observed_outputs_by_input.values():
-        for output, counts in observed_outputs_counts.items():
-            if output in total_observed_output_counts:
-                total_observed_output_counts[output] += counts
-            else:
-                total_observed_output_counts[output] = counts
-            total += counts
-    return total_observed_output_counts, total
+    for input_value, expected_outputs_probabilities in \
+        expected_outputs_probabilities_by_input.items():
+        observed_outputs_counts_including_zeros = \
+            add_zero_count_for_non_observed_outputs(
+                observed_outputs_counts_by_input[input_value],
+                expected_outputs_probabilities)
+        observed_outputs_counts_by_input[input_value] = \
+            observed_outputs_counts_including_zeros
+    return observed_outputs_counts_by_input
 
-def get_total_expected_output_counts(
-        expected_outputs_probabilities_by_input: dict,
-        total_observed_counts: int
-        ) -> dict:
+def add_zero_count_for_non_observed_outputs(
+        observed_outputs_counts: dict,
+        expected_outputs_probabilities: dict) -> dict:
     """
-    gets the total expected output counts from the expected probabilities
-        given the total number of outputs observed
+    adds 0 counts to observed outputs when it is not observed, but
+        it is expected
     """
-    expected_output_counts = {}
-    total = 0
-    for expected_outputs_probabilities in expected_outputs_probabilities_by_input.values():
-        for output, probability in expected_outputs_probabilities.items():
-            count = probability * 100
-            if output in expected_output_counts:
-                expected_output_counts[output] += count
-            else:
-                expected_output_counts[output] = count
-            total += count
-    scale = total_observed_counts / total
-    return {
-        output: counts * scale
-        for output, counts in expected_output_counts.items()
-    }
+    for output in expected_outputs_probabilities.keys():
+        output_counts = observed_outputs_counts.get(output)
+        if output_counts is None:
+            # the output is not observed, but is expected
+            observed_outputs_counts[output] = 0
+    return observed_outputs_counts
+
+def calculate_chisquare_for_each_input(
+        observed_outputs_counts_by_input: dict,
+        expected_outputs_probabilities_by_input: dict
+        ) -> Tuple[dict, List]:
+    """
+    calculate the chi-square for each input
+    """
+    wrong_outputs = [] # observed output that is not expected
+    for input_value, observed_outputs_counts in \
+        observed_outputs_counts_by_input.items():
+        total_counts = get_total_counts(observed_outputs_counts)
+
+        # get_expected_output(expected_outputs_probabilities, total_counts)
+
+def get_total_counts(observed_outputs_counts: dict) -> int:
+    return sum(observed_outputs_counts.values())
 
 def save_wrong_outputs_by_input(
         wrong_outputs: List[dict],

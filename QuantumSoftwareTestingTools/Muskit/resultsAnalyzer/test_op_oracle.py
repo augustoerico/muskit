@@ -1,64 +1,74 @@
 """
 Tests for op_oracle module
 """
-from op_oracle import get_total_observed_output_counts, \
-    get_total_expected_output_counts
+from op_oracle import add_zero_count_for_non_observed_outputs
 
-def test_should_get_total_observed_output_counts():
+def test_should_add_zero_count_for_non_observed_outputs():
     """
-    test should get the total observed output given
-        the observed outputs by input
+    test should add zero count for non observed outputs that
+        are expected
     """
     # given
-    observed_outputs_by_input = {
-        "0000000": { "0000001": 24, "0000101": 76 },
-        "0000001": { "0001001": 29, "0001101": 71 },
-        "0000010": { "0010001": 29, "0010101": 71 },
-        "0000011": { "0011001": 29, "0011101": 71 },
-        "0000100": { "0000001": 75, "0000101": 25 },
-        "0000101": { "0001001": 73, "0001101": 27 },
-        "0000110": { "0010001": 75, "0010101": 25 },
-        "0000111": { "0011001": 79, "0011101": 21 }
+    observed_outputs_counts = { # "01" not observed
+        "00": 15, "10": 6, "11": 29
+    }
+    expected_outputs_probabilities = {
+        "00": .1478, "01": .5505, "10": .0675, "11": .2342
     }
 
     # when
-    counts, total = get_total_observed_output_counts(
-        observed_outputs_by_input)
+    observed_outputs_counts_result = \
+        add_zero_count_for_non_observed_outputs(
+            observed_outputs_counts,
+            expected_outputs_probabilities)
 
     # then
-    assert total == 800
-    assert counts == {
-        "0000001": 99, "0000101": 101,
-        "0001001": 102, "0001101": 98,
-        "0010001": 104, "0010101": 96,
-        "0011001": 108, "0011101": 92
+    assert observed_outputs_counts_result == {
+        "00": 15, "01": 0, "10": 6, "11": 29
     }
 
-def test_should_get_total_expected_output_counts():
+def test_should_not_change_counts_if_all_expected_outputs_are_observed():
     """
-    test should get the total expected output counts given
-        the expected output probabilities and the total
-        observed count
+    test should not change counts if all expected outputs are observed
     """
     # given
-    total = 1600
-    expected_outputs_by_input = {
-        "0000000": { "0000001": 1.0 },
-        "0000001": { "0000001": 1.0 },
-        "0000010": { "0000001": 0.25, "0000010": 0.75 },
-        "0000011": { "0000001": 0.75, "0000010": 0.25 },
-        "0000100": { "0000001": 0.25, "0000011": 0.75 },
-        "0000101": { "0000001": 0.75, "0000011": 0.25 },
-        "0000110": { "0000000": 0.75, "0000001": 0.25 },
-        "0000111": { "0000000": 0.25, "0000001": 0.75 },
+    observed_outputs_counts = {
+        "00": 15, "01": 55, "10": 6, "11": 29
+    }
+    expected_outputs_probabilities = {
+        "00": .1478, "01": .5505, "10": .0675, "11": .2342
     }
 
     # when
-    counts = get_total_expected_output_counts(
-        expected_outputs_by_input, total)
+    observed_outputs_counts_result = \
+        add_zero_count_for_non_observed_outputs(
+            observed_outputs_counts,
+            expected_outputs_probabilities)
 
     # then
-    assert counts == {
-        "0000000": 200, "0000001": 1000,
-        "0000010": 200, "0000011": 200,
+    assert observed_outputs_counts_result == {
+        "00": 15, "01": 55, "10": 6, "11": 29
+    }
+
+def test_should_add_zero_count_when_probability_expected_is_zero():
+    """
+    test should add zero count when probability is also zero
+    """
+    # given
+    observed_outputs_counts = {
+        "00": 15, "01": 55, "11": 29
+    }
+    expected_outputs_probabilities = {
+        "00": .2153, "01": .5505, "10": .0, "11": .2342
+    }
+
+    # when
+    observed_outputs_counts_result = \
+        add_zero_count_for_non_observed_outputs(
+            observed_outputs_counts,
+            expected_outputs_probabilities)
+
+    # then
+    assert observed_outputs_counts_result == {
+        "00": 15, "01": 55, "10": 0, "11": 29
     }
