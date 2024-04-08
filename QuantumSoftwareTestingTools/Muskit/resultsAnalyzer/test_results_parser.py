@@ -40,6 +40,22 @@ def test_should_extract_counts_by_input_from_results_line():
     # then
     assert counts_by_input == { '0000001': { '0001101': 69, '0001001': 31 } }
 
+def test_should_extract_counts_by_input_from_results_line_with_n_qubits():
+    """
+    test_should_extract_counts_by_input_from_results_line_with_n_qubits
+    """
+    # given
+    line = "The result of E:\\muskit\\QuantumSoftwareTestingTools\\Muskit\\ExampleTest" \
+        + "\\1AddGate_x_inGap_1_.py with input [0000001] is: {'0001101': 69, '0001001': 31}"
+    n_qubits = 4
+
+    # when
+    counts_by_input = results_parser.extract_counts_by_input(line, n_qubits)
+
+    # then
+    assert counts_by_input == { '0001': { '1101': 69, '1001': 31 } }
+
+
 def test_should_add_counts_by_id_into_an_empty_output_dictionary():
     """
     test should add counts by id dictionary into an empty output dictionary

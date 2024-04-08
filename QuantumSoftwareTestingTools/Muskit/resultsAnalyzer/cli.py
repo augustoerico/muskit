@@ -20,11 +20,13 @@ pass_console = Console()
 
 
 @app.command()
-def parse_results(results: Annotated[Path, typer.Option(**typer_options)]):
+def parse_results(
+    results: Annotated[Path, typer.Option(**typer_options)],
+    n_qubits: Annotated[int, typer.Argument(min=1)]):
     """
     parse results from Muskit.execute into multiple json files
     """
-    r_parse(results)
+    r_parse(results, n_qubits)
 
 @app.command()
 def parse_spec(
