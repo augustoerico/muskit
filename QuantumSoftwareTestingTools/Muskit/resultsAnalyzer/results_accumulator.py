@@ -44,6 +44,6 @@ def get_measured_qubits(
     """
     measured_qubits = ''
     qubits = list(observed_output)
-    for id in qubits_ids:
-        measured_qubits += qubits[id]
+    for qubit_id in qubits_ids:
+        measured_qubits += qubits[qubit_id]
     return measured_qubits
