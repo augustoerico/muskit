@@ -3,7 +3,7 @@ Output Probability Oracle
 """
 from os.path import dirname
 from pathlib import Path
-from typing import List, Tuple
+from typing import List
 
 from scipy.stats import chisquare
 import simplejson
@@ -21,10 +21,15 @@ def verify(
         expected_outputs_probabilities_by_input = simplejson.load(file)
 
     observed_outputs_counts_by_input = \
-        add_zero_count_for_non_observed_outputs(
+        add_zero_count_for_non_observed_outputs_by_input(
             observed_outputs_counts_by_input,
             expected_outputs_probabilities_by_input
-        )
+            )
+    expected_outputs_probabilities_by_input = \
+        add_zero_probability_for_non_expected_outputs_by_input(
+            expected_outputs_probabilities_by_input,
+            observed_outputs_counts_by_input
+            )
     total_counts_by_input = get_total_counts_by_input(
         observed_outputs_counts_by_input)
     expected_outputs_counts_by_input = \
@@ -78,17 +83,54 @@ def get_expected_outputs_counts(
             expected_outputs_probabilities.items()
     }
 
+def add_zero_probability_for_non_expected_outputs(
+    expected_outputs_probabilities: dict,
+    observed_outputs_counts: dict
+    ):
+    """
+    adds 0 probability to the outputs when it is observed, but not expected
+    """
+    for output in observed_outputs_counts.keys():
+        outputs_probabilities = expected_outputs_probabilities.get(output)
+        if outputs_probabilities is None:
+            # the output is not expected, but it was observed
+            expected_outputs_probabilities[output] = .0
+    return expected_outputs_probabilities
+
+def add_zero_probability_for_non_expected_outputs_by_input(
+        expected_outputs_probabilities_by_input: dict,
+        observed_outputs_counts_by_input) -> dict:
+    """
+    adds 0 probability when the output is not expected, but it is observed
+    """
+    for input_value, observed_outputs_counts in \
+        observed_outputs_counts_by_input.items():
+        expected_outputs_probabilities_including_zeros = \
+            add_zero_probability_for_non_expected_outputs(
+                expected_outputs_probabilities_by_input[input_value],   # [FIXME] this will raise an
+                                                                        #   exception it an input
+                                                                        #   ran in the target
+                                                                        #   circuit is not specified
+                observed_outputs_counts
+                )
+        expected_outputs_probabilities_by_input[input_value] = \
+            expected_outputs_probabilities_including_zeros
+    return expected_outputs_probabilities_by_input
+
 def add_zero_count_for_non_observed_outputs_by_input(
         observed_outputs_counts_by_input: dict,
         expected_outputs_probabilities_by_input: dict) -> dict:
     """
-    adds 0 counts when the output is not observed, but is expected
+    adds 0 counts when the output is not observed, but it is expected
     """
     for input_value, expected_outputs_probabilities in \
         expected_outputs_probabilities_by_input.items():
         observed_outputs_counts_including_zeros = \
             add_zero_count_for_non_observed_outputs(
-                observed_outputs_counts_by_input[input_value],
+                observed_outputs_counts_by_input[input_value],  # [FIXME] this will raise an
+                                                                #   exception if an specified
+                                                                #   input was not run in the
+                                                                #   target circuit
                 expected_outputs_probabilities)
         observed_outputs_counts_by_input[input_value] = \
             observed_outputs_counts_including_zeros

@@ -3,6 +3,8 @@ Tests for op_oracle module
 """
 from op_oracle import add_zero_count_for_non_observed_outputs, \
     add_zero_count_for_non_observed_outputs_by_input, \
+    add_zero_probability_for_non_expected_outputs, \
+    add_zero_probability_for_non_expected_outputs_by_input, \
     get_expected_outputs_counts, \
     get_expected_outputs_counts_by_input
 
@@ -107,6 +109,84 @@ def test_should_add_zero_counts_for_all_non_observed_outputs_by_input():
         "01": { "00": 16, "01": 55, "10": 0, "11": 19 },
         "10": { "00": 2, "01": 60, "10": 10, "11": 11 },
         "11": { "00": 11, "01": 2, "10": 60, "11": 10 }
+    }
+
+def test_should_add_zero_probability_for_non_expected_outputs():
+    """
+    test_should_add_zero_probability_for_non_expected_outputs
+    """
+    # given
+    expected_outputs_probabilities = {
+        "00": .5, "10": .2, "11": .3    # "01" is not expected
+    }
+    observed_outputs_counts = {
+        "00": 42, "01": 3, "10": 10, "11": 15
+    }
+
+    # when
+    result = add_zero_probability_for_non_expected_outputs(
+        expected_outputs_probabilities,
+        observed_outputs_counts
+        )
+    
+    # then
+    assert result == {
+        "00": .5, "01": .0, "10": .2, "11": .3
+    }
+
+def test_should_not_change_probabilities_it_all_observed_outputs_are_expected():
+    """
+    test_should_not_change_probabilities_it_all_observed_outputs_are_expected
+    """
+    # given
+    expected_outputs_probabilities = {
+        "00": .5, "01": .1, "10": .2, "11": .2
+    }
+    observed_outputs_counts = {
+        "00": 7, "01": 0, "10": 2, "11": 1
+    }
+
+    # when
+    result = add_zero_probability_for_non_expected_outputs(
+        expected_outputs_probabilities,
+        observed_outputs_counts)
+    
+    # then
+    assert result == {
+        "00": .5, "01": .1, "10": .2, "11": .2
+    }
+
+def test_should_add_zero_probabilities_for_non_expected_outputs_by_input():
+    """
+    test_should_add_zero_probabilities_for_non_expected_outputs_by_input
+    """
+    # given
+    expected_outputs_probabilities_by_input = {
+        "00": { "00": .5, "01": .1, "10": .4 },
+        "01": { "01": .3, "10": .4, "11": .3 },
+        "10": { "00": .3, "01": .2, "10": .25, "11": .25},
+        "11": { "00": .09, "01": .21, "10": .0, "11": .7 }
+    }
+    observed_outputs_counts_by_input = {
+        "00": { "00": 15, "01": 2, "10": 6, "11": 29 },
+        "01": { "01": 55, "10": 23, "11": 19 }, # "00" was neither observer, nor expected
+        "10": { "00": 2, "01": 60, "10": 10 }, # "11" was not observed, but it is expected
+        "11": { "00": 11, "01": 2, "10": 60, "11": 10 }
+    }
+    
+
+    # when
+    result = \
+        add_zero_probability_for_non_expected_outputs_by_input(
+            expected_outputs_probabilities_by_input,
+            observed_outputs_counts_by_input)
+
+    # then
+    assert result == {
+        "00": { "00": .5, "01": .1, "10": .4, "11": .0 },
+        "01": { "01": .3, "10": .4, "11": .3 },
+        "10": { "00": .3, "01": .2, "10": .25, "11": .25 },
+        "11": { "00": .09, "01": .21, "10": .0, "11": .7 }
     }
 
 def test_should_get_expected_output_counts():
