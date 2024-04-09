@@ -85,6 +85,7 @@ def calculate_chisquare_for_each_input(
         r = chisquare(f_exp=f_expected_outputs, f_obs=f_observed_outputs)
         results = [
             *results, {
+                "input": input_value,
                 "f_exp": f_expected_outputs,
                 "f_obs": f_observed_outputs,
                 "r": r 
