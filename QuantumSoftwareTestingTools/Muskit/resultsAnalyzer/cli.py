@@ -3,6 +3,7 @@ CLI entry for analysing results
 """
 from pathlib import Path
 from typing import Optional
+import toml
 
 import typer
 from typing_extensions import Annotated
@@ -41,29 +42,17 @@ def parse_spec(
 
 @app.command()
 def verify_opo(expected: Annotated[Path, typer.Option(**typer_options)],
-               observed: Annotated[Path, typer.Option(**typer_options)]):
+               observed: Annotated[Path, typer.Option(**typer_options)],
+               config: Annotated[Path, typer.Option(**typer_options)]):
     """
     Verify PARSED results obtained from Muskit.execute against the
         PARSED program specification
     """
-    op_oracle.verify(expected, observed, .01)
-
-# @app.command()
-# def verify_woo(
-#     results: Annotated[Path, typer.Option(**typer_options)],
-#     specification: Annotated[Path, typer.Option(**typer_options)]
-#     ):
-#     """
-#     Verify results obtained from Muskit.execute against the program specification.
-#         It also creates JSON files for each mutant execution
-#     """
-#     try:
-#         # assert_all_valid_outputs()
-#         message = "PASS"
-#         pass_console.print(message, style="green")
-#     except AssertionError as _:
-#         message = "FAIL"
-#         fail_console.print(message, style="red")
+    config_options = toml.load(config)
+    op_oracle.verify(
+        expected, observed,
+        config_options['qubits'],
+        config_options['p_value'])
 
 
 if __name__ == '__main__':

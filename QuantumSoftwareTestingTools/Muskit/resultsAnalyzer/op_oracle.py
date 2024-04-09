@@ -3,55 +3,85 @@ Output Probability Oracle
 """
 from os.path import dirname
 from pathlib import Path
-from typing import List
+from typing import List, Tuple
 
 from scipy.stats import chisquare
 import simplejson
 
+from results_accumulator import accumulate_results_by_input
+
 def verify(
         expected_outputs_by_input_file_path: Path,
         observed_outputs_by_input_file_path: Path,
-        pvalue: float):
+        measured_qubits_ids: List[int], pvalue: float):
     """
-    Verifies expected results against actual results for a given input
+    Verifies expected results against actual results
     """
     with open(observed_outputs_by_input_file_path, 'r', encoding='utf-8') as file:
         observed_outputs_counts_by_input = simplejson.load(file)
     with open(expected_outputs_by_input_file_path, 'r', encoding='utf-8') as file:
         expected_outputs_probabilities_by_input = simplejson.load(file)
 
-    observed_outputs_counts_by_input = \
-        add_zero_count_for_non_observed_outputs_by_input(
-            observed_outputs_counts_by_input,
-            expected_outputs_probabilities_by_input
-            )
-    expected_outputs_probabilities_by_input = \
-        add_zero_probability_for_non_expected_outputs_by_input(
-            expected_outputs_probabilities_by_input,
-            observed_outputs_counts_by_input
-            )
     total_counts_by_input = get_total_counts_by_input(
         observed_outputs_counts_by_input)
+
+    observed_outputs_counts_by_input = \
+        accumulate_results_by_input(
+            observed_outputs_counts_by_input,
+            measured_qubits_ids)
+
+    save_accumulated_observed_outputs(observed_outputs_counts_by_input,
+                                      observed_outputs_by_input_file_path)
+
     expected_outputs_counts_by_input = \
         get_expected_outputs_counts_by_input(
             expected_outputs_probabilities_by_input,
             total_counts_by_input
         )
-    # results, wrong_outputs = calculate_chisquare_for_each_input(
-    #     observed_outputs_counts_by_input,
-    #     expected_outputs_probabilities_by_input)
 
-    # wrong_outputs = []
-    # expected_outputs_by_input = expected_outputs_by_input.get(input_value) # |
-    #         # None means a Wrong Output was observed
-    #     if expected_outputs_by_input is None:
-    #         wrong_outputs = [
-    #             *wrong_outputs,
-    #             { "input": input_value, "outputs": observed_outputs_counts }
-    #
-    # if len(wrong_outputs) > 0:
-    #     save_wrong_outputs_by_input(wrong_outputs, observed_outputs_by_input_file_path)
-    # save_results(results, observed_results_file_path)
+    results, wrong_outputs = calculate_chisquare_for_each_input(
+        observed_outputs_counts_by_input,
+        expected_outputs_counts_by_input)
+
+    if len(wrong_outputs) > 0:
+        save_wrong_outputs_by_input(wrong_outputs, observed_outputs_by_input_file_path)
+    save_results(results, observed_outputs_by_input_file_path)
+
+def get_observed_outputs_counts_by_input(
+        observed_outputs_counts_by_input: dict,
+        expected_outputs_probabilities_by_input: dict,
+        measured_qubits_ids: List[int]):
+    """
+    get_observed_outputs_counts_by_input
+    """
+    return accumulate_results_by_input(
+        remove_unexpecteds_by_input(
+            observed_outputs_counts_by_input, \
+            expected_outputs_probabilities_by_input),
+        measured_qubits_ids
+    )
+
+def calculate_chisquare_for_each_input(
+        observed_outputs_counts_by_input: dict,
+        expected_outputs_counts_by_input: dict
+        ) -> Tuple[dict, List]:
+    """
+    calculate the chi-square for each input
+    """
+    for input_value, observed_outputs_counts in \
+        observed_outputs_counts_by_input.items():
+        expected_outputs_counts = \
+            expected_outputs_counts_by_input[input_value]   # [FIXME] will raise an exception
+                                                            #   for the same reason as [1]
+        f_expected_outputs = list(expected_outputs_counts.values())
+        f_observed_outputs = list(observed_outputs_counts.values())
+        print(f"<{input_value}>")
+        print(f_expected_outputs)
+        print(f_observed_outputs)
+        print('----------------')
+        r = chisquare(f_exp=f_expected_outputs, f_obs=f_observed_outputs)
+        print(r)
+    return [], []
 
 def get_expected_outputs_counts_by_input(
         expected_outputs_probabilities_by_input: dict,
@@ -83,6 +113,31 @@ def get_expected_outputs_counts(
             expected_outputs_probabilities.items()
     }
 
+def remove_unexpecteds_by_input(
+        observed_outputs_counts_by_input: dict,
+        expected_outputs_probabilities_by_input: dict) -> dict:
+    """
+    remove_unexpecteds_by_input
+    """
+    return {
+        input_value: remove_unexpected(
+            observed_outputs_counts_by_input.get(input_value, {}),
+            expected_outputs_probabilities
+            ) for input_value, expected_outputs_probabilities in \
+                expected_outputs_probabilities_by_input.items()
+    }
+
+def remove_unexpected(
+        observed_outputs_counts: dict,
+        expected_outputs_probabilities: dict) -> dict:
+    """
+    remove_unexpected
+    """
+    return {
+        output: observed_outputs_counts.get(output, 0)
+        for output in expected_outputs_probabilities.keys()
+    }
+
 def add_zero_probability_for_non_expected_outputs(
     expected_outputs_probabilities: dict,
     observed_outputs_counts: dict
@@ -107,8 +162,8 @@ def add_zero_probability_for_non_expected_outputs_by_input(
         observed_outputs_counts_by_input.items():
         expected_outputs_probabilities_including_zeros = \
             add_zero_probability_for_non_expected_outputs(
-                expected_outputs_probabilities_by_input[input_value],   # [FIXME] this will raise an
-                                                                        #   exception it an input
+                expected_outputs_probabilities_by_input[input_value],   # [FIXME][1] this will raise
+                                                                        #   an exception it an input
                                                                         #   ran in the target
                                                                         #   circuit is not specified
                 observed_outputs_counts
@@ -150,20 +205,6 @@ def add_zero_count_for_non_observed_outputs(
             observed_outputs_counts[output] = 0
     return observed_outputs_counts
 
-# def calculate_chisquare_for_each_input(
-#         observed_outputs_counts_by_input: dict,
-#         expected_outputs_probabilities_by_input: dict
-#         ) -> Tuple[dict, List]:
-#     """
-#     calculate the chi-square for each input
-#     """
-#     wrong_outputs = [] # observed output that is not expected
-#     for input_value, observed_outputs_counts in \
-#         observed_outputs_counts_by_input.items():
-#         total_counts = get_total_counts(observed_outputs_counts)
-
-#         # get_expected_output(expected_outputs_probabilities, total_counts)
-
 def get_total_counts_by_input(
         observed_outputs_counts_by_input: dict) -> int:
     """
@@ -191,8 +232,19 @@ def save_results(results: List, observed_results_file_path: Path):
     """
     Save results into JSON file
     """
-    print('asdfasdfasdfa')
     file_name = f"{dirname(observed_results_file_path)}" \
         + f"/{observed_results_file_path.stem}.results.json"
-    with open(file_name, 'w', encoding="utf-8") as file:
+    with open(file_name, 'w+', encoding="utf-8") as file:
         simplejson.dump(results, file, ignore_nan=True, indent=4)
+
+def save_accumulated_observed_outputs(
+        accumulated_observed_outputs,
+        observed_outputs_by_input_file_path: Path):
+    """
+    Save accumulated results into JSON file
+    """
+    file_name = f"{dirname(observed_outputs_by_input_file_path)}" \
+        + f"/{observed_outputs_by_input_file_path.stem}.acc.json"
+    with open(file_name, 'w+', encoding="utf-8") as file:
+        simplejson.dump(accumulated_observed_outputs, file,
+                        ignore_nan=True, indent=4)
