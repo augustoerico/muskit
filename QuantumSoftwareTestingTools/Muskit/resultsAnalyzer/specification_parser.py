@@ -29,7 +29,11 @@ def get_output_probabilities_by_input_from_file_lines(lines: List[str]) -> dict:
     output_probabilities_by_input = {}
     for line in lines:
         input_value, output, probability = parse_specification_line(line)
-        output_probabilities_by_input[input_value] = { output: probability }
+        if input_value not in output_probabilities_by_input:
+            output_probabilities_by_input[input_value] = { output: probability }
+        else:
+            outputs = output_probabilities_by_input[input_value]
+            output_probabilities_by_input[input_value] = { **outputs, output: probability}
     return output_probabilities_by_input
 
 def save_parsed_spec(specification_file_path: Path, output_probabilities_by_input: dict):
