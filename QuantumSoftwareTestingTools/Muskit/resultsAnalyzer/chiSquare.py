@@ -40,17 +40,17 @@ def validation(observedFile, expectedFile):
         else:
             if first == False:
                 y = 0
-                expectedList = list(expectedDic)
-                observedList = list(observedDic)
+                expectedList = list(expectedDic) # (input, output)
+                observedList = list(observedDic) # (input, output)
                 while y < 32: # the number of inputs
-                    expectedArray = ["", ]
-                    observedArray = ["", ]
+                    expectedArray = ["", ] # expected probabilities
+                    observedArray = ["", ] # observed probabilities
                     n = 0
                     while n <= 2**conf.inputQubits:
                         n = n + 1
                         expectedArray.append("")
                         observedArray.append("")
-                    expectedArray2 = []
+                    expectedArray2 = [] # expected outputs
                     for z in expectedList:
                         tmp = z.split(", ")
                         num = tmp[1].split(")")
@@ -58,7 +58,7 @@ def validation(observedFile, expectedFile):
                         if int(input[1]) == y:
                             expectedArray[int(num[0])] = expectedDic[z]
                             expectedArray2.append(num[0])
-                    observedArray2 = []
+                    observedArray2 = [] # observed outputs
                     for z in observedList:
                         tmp = z.split(", ")
                         num = tmp[1].split(")")
@@ -73,7 +73,7 @@ def validation(observedFile, expectedFile):
                         observedArray.remove("")
                     expectedArray2.sort()
                     observedArray2.sort()
-                    if observedArray2 == expectedArray2:
+                    if observedArray2 == expectedArray2: # expected output == observed output
                         result = chisquare(expectedArray, observedArray)
 
                         if result[1] < conf.p_value:
@@ -88,20 +88,20 @@ def validation(observedFile, expectedFile):
                             g.write("\n")
                     else:
                         inside = True
-                        for z in observedArray2:
-                            if z not in expectedArray2:
-                                inside = False
+                        for z in observedArray2: # for each observed output
+                            if z not in expectedArray2: # if observed output not in expected output
+                                inside = False # at least 1 observed output not found in expected outputs => failed without checking p-value
                         if inside == False:
                             g.write("File: " + str(filename[0]) + " with input [" + str(y) + "]" + "FAILED DIRECTLY without checking P-Value ")
                             g.write("\n")
-                        else:
+                        else: # all observed outputs are in expected outputs
                             i = 0
                             filedObservedArray = []
-                            for z in expectedArray2:
-                                if z not in observedArray2:
-                                    filedObservedArray.append(0)
+                            for z in expectedArray2: # for each expected output
+                                if z not in observedArray2: # if expected output not found in observed outputs
+                                    filedObservedArray.append(0) # probability = 0
                                 else:
-                                    filedObservedArray.append(observedArray[i])
+                                    filedObservedArray.append(observedArray[i]) # probability = current probability pointed by i
                                     i = i + 1
                             result = chisquare(expectedArray, filedObservedArray)
                             if result[1] < conf.p_value:
@@ -109,7 +109,7 @@ def validation(observedFile, expectedFile):
                                     y) + "]" + " FAILED WITH P-Value " + str(result[1]))
                                 g.write("\n")
                             else:
-                                if math.isnan(result[1]):
+                                if math.isnan(result[1]): # this shouldn't happen...
                                     p_value = 1
                                 else:
                                     p_value = result[1]
@@ -124,3 +124,14 @@ def validation(observedFile, expectedFile):
     g.write(f'<- {datetime.now().isoformat()}\n')
     g.close()
     return
+
+def debug():
+    """
+    debug `validate` with fixed args
+    """
+    observed_file = "QuantumSoftwareTestingTools/Muskit/ExperimentalData/QRAM/cleanResults.txt"
+    expected_file = "QuantumSoftwareTestingTools/Muskit/ExperimentalData/QRAM/QR_test_oracle.txt"
+    validation(observed_file, expected_file)
+
+if __name__ == '__main__':
+    debug()

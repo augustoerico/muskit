@@ -5,8 +5,9 @@ import chiSquare
 
 def resultCleaner(filename, saveDirectory):
   f = open(filename, "r+")
-  saveDirectory = saveDirectory + chr(47) + "cleanResults.txt"
-  g = open((saveDirectory), "w")
+  # saveDirectory = saveDirectory + chr(47) + "cleanResults.txt"
+  saveDirectory = f"{saveDirectory}\\cleanResults.txt"
+  g = open(saveDirectory, "w+")
   prefile = ""
   preinput = ""
   for x in f:
@@ -68,15 +69,13 @@ def main():
   observedFile = resultCleaner(results, saveDirectory)
   chiSquare.validation(observedFile, expectedFile)
 
-def debug():
+def debug_results_cleaner():
   """Rewires main() for easier debug"""
-  RESULTS_FILE_PATH = 'E:\\muskit\\QuantumSoftwareTestingTools\\Muskit\\Example\\AddMutations\\results.txt'
-  SPECIFICATION_FILE_PATH = 'E:\\muskit\\QuantumSoftwareTestingTools\\Muskit\\Example\\QR_program_specification.txt'
-  SAVE_VALIDATION_DIR_PATH = 'E:\\muskit\\QuantumSoftwareTestingTools\\Muskit\\Example'
+  results_file_path = 'E:\\2\\muskit\\QuantumSoftwareTestingTools\\Muskit\\ExperimentalData\\QRAM\\results.txt'
+  save_validation_dir_path = 'E:\\2\\muskit\\QuantumSoftwareTestingTools\\Muskit\\ExperimentalData\\QRAM'
 
-  observed_file = resultCleaner(RESULTS_FILE_PATH, SAVE_VALIDATION_DIR_PATH)
-  chiSquare.validation(observed_file, SPECIFICATION_FILE_PATH)
+  resultCleaner(results_file_path, save_validation_dir_path)
 
 if __name__ == "__main__":
-  main()
-  # debug()
+  # main()
+  debug_results_cleaner()
