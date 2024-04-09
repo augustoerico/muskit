@@ -1,0 +1,7 @@
+# Outputs Probabilities Oracle Configuration Variables
+
+# qubits that should be measured
+qubits = [0, 1]
+
+# significance level for a statistical test
+p_value = 0.05

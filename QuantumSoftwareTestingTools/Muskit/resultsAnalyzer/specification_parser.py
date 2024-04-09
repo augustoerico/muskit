@@ -7,25 +7,36 @@ from typing import List, Tuple
 
 import simplejson
 
+from utils import fix_number_of_qubits
+
 def parse(specification_file_path: Path, save_output: bool = True):
     """
     parses the Quantum Program specification file into a dictionary
     """
-    output_probabilities_by_input = {}
+    # [TODO] extract the file read and save to a higher level
+    # then add a test
     with open(specification_file_path, 'r', encoding='utf-8') as file:
-        for line in file.readlines():
-            input_value, output, probability = \
-                parse_specification_line(line)
-            output_probabilities_by_input = \
-                add_to_output_probabilities_by_input_dict(
-                    input_value, output, probability,
-                    output_probabilities_by_input
-                    )
+        output_probabilities_by_input = \
+            get_output_probabilities_by_input_from_file_lines(file.readlines())
 
-    parsed = fix_number_of_bits(output_probabilities_by_input)
+    parsed = fix_number_of_qubits(output_probabilities_by_input)
     if save_output:
         save_parsed_spec(specification_file_path, parsed)
     return parsed
+
+def get_output_probabilities_by_input_from_file_lines(lines: List[str]) -> dict:
+    """
+    get_output_probabilities_by_input_from_file_lines
+    """
+    output_probabilities_by_input = {}
+    for line in lines:
+        input_value, output, probability = parse_specification_line(line)
+        if input_value not in output_probabilities_by_input:
+            output_probabilities_by_input[input_value] = { output: probability }
+        else:
+            outputs = output_probabilities_by_input[input_value]
+            output_probabilities_by_input[input_value] = { **outputs, output: probability}
+    return output_probabilities_by_input
 
 def save_parsed_spec(specification_file_path: Path, output_probabilities_by_input: dict):
     """
@@ -37,28 +48,11 @@ def save_parsed_spec(specification_file_path: Path, output_probabilities_by_inpu
     with open(json_file_path, 'w', encoding='utf-8') as file:
         simplejson.dump(output_probabilities_by_input, fp=file, indent=4)
 
-def fix_number_of_bits(output_probabilities_by_input: dict):
-    """
-    add zeros to the left to match the highest bit counts
-    """
-    max_lenght_of_bits = 0
-    for i in output_probabilities_by_input.keys():
-        lenght_of_bits = len(i)
-        if lenght_of_bits > max_lenght_of_bits:
-            max_lenght_of_bits = lenght_of_bits
-    result = {}
-    for i, op in output_probabilities_by_input.items():
-        result[i.zfill(max_lenght_of_bits)] = {
-            o.zfill(max_lenght_of_bits): p
-            for o, p in op.items()
-        }
-    return result
-
 def parse_specification_line(line: str) -> Tuple[str, str, float]:
     """
     parse the Quantum Program specification file line into a tuple
         input, output, probability
-    """
+    """    
     return *extract_input_output_pair(line), extract_probability(line)
 
 def extract_input_output_pair(line: str) -> List[str]:

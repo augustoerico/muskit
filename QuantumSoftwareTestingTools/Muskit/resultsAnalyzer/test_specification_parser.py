@@ -1,44 +1,27 @@
 """
 Tests for the specification_parser module
 """
-import pytest
-import specification_parser
+from specification_parser import get_output_probabilities_by_input_from_file_lines
 
-@pytest.fixture(autouse=True)
-def change_test_dir(request, monkeypatch):
+def test_should_parse_the_spec_lines_into_json():
     """
-    changes the working dir to this one
-    """
-    monkeypatch.chdir(request.fspath.dirname)
-
-def test_should_parse_the_specification_file():
-    """
-    test should parse the valid example specification file
-        into a dictionary with the output probabilities by
-        input
+    test_should_parse_the_spec_lines_into_json
     """
     # given
-    specification_file_path = "test_resources/qram.spec.txt"
+    spec_lines = [
+        "(0, 1): 1.0", "(1, 1): 1.0", "(2, 1): 0.25", "(2, 2): 0.75",
+        "(3, 1): 0.75", "(3, 2): 0.25", "(4, 1): 0.25", "(4, 3): 0.75",
+        "(5, 1): 0.75", "(5, 3): 0.25", "(6, 0): 0.75", "(6, 1): 0.25",
+        "(7, 0): 0.25", "(7, 1): 0.75"
+    ]
 
     # when
-    output_probabilities_by_input = \
-        specification_parser.parse(specification_file_path)
-    print(output_probabilities_by_input)
+    result = get_output_probabilities_by_input_from_file_lines(spec_lines)
 
     # then
-    assert output_probabilities_by_input == {
-        '000': { '001': 1.0 },
-        '001': { '001': 1.0 },
-        '010': { '001': 0.24999999999999994,
-                  '010': 0.7500000000000001 },
-        '011': { '001': 0.7500000000000001,
-                  '010': 0.2499999999999999 },
-        '100': { '001':0.24999999999999994 ,
-                  '011': 0.7500000000000001 },
-        '101': { '001': 0.7500000000000001,
-                  '011': 0.2499999999999999 },
-        '110': { '000': 0.7500000000000001,
-                  '001': 0.24999999999999994 },
-        '111': { '000': 0.2499999999999999,
-                  '001': 0.7500000000000001 }
+    assert result == {
+        "0": { "1": 1. }, "1": { "1": 1. }, "10": { "1": .25, "10": .75 },
+        "11": { "1": .75, "10": .25 }, "100": { "1": .25, "11": .75 },
+        "101": { "1": .75, "11": .25 }, "110": { "0": .75, "1": .25 },
+        "111": { "0": .25, "1": .75 }
     }
