@@ -40,7 +40,7 @@ def parse_spec(
     s_parse(spec, save)
 
 @app.command()
-def verify_opo(expected: Annotated[Path, typer.Option(**typer_options)],
+def calculate_chi2(expected: Annotated[Path, typer.Option(**typer_options)],
                observed: Annotated[Path, typer.Option(**typer_options)],
                config: Annotated[Path, typer.Option(**typer_options)]):
     """
@@ -48,10 +48,9 @@ def verify_opo(expected: Annotated[Path, typer.Option(**typer_options)],
         PARSED program specification
     """
     config_options = toml.load(config)
-    op_oracle.verify(
+    op_oracle.calculate_chi_square(
         expected, observed,
-        config_options['qubits'],
-        config_options['p_value'])
+        config_options['qubits'])
 
 
 if __name__ == '__main__':

@@ -10,10 +10,10 @@ import simplejson
 
 from results_accumulator import accumulate_results_by_input
 
-def verify(
+def calculate_chi_square(
         expected_outputs_by_input_file_path: Path,
         observed_outputs_by_input_file_path: Path,
-        measured_qubits_ids: List[int], pvalue: float):
+        measured_qubits_ids: List[int]):
     """
     Verifies expected results against actual results
     """
