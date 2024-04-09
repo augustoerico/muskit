@@ -32,13 +32,12 @@ def parse_results(
 @app.command()
 def parse_spec(
     spec: Annotated[Path, typer.Option(**typer_options)],
-    n_qubits: Annotated[int, typer.Argument(min=1)],
     save: Annotated[Optional[bool], typer.Argument()] = True
     ):
     """
     parses a specification into JSON format
     """
-    s_parse(spec, n_qubits, save)
+    s_parse(spec, save)
 
 @app.command()
 def verify_opo(expected: Annotated[Path, typer.Option(**typer_options)],

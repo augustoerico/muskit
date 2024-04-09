@@ -1,80 +1,55 @@
 """
 Tests for the specification_parser module
 """
-import pytest
-import specification_parser
+from specification_parser import get_len_qubits_in_output, \
+    get_len_qubits_in_input, fix_number_of_qubits
 
-@pytest.fixture(autouse=True)
-def change_test_dir(request, monkeypatch):
+def test_should_get_outputs_qubits_length():
     """
-    changes the working dir to this one
-    """
-    monkeypatch.chdir(request.fspath.dirname)
-
-def test_should_parse_the_specification_file():
-    """
-    test should parse the valid example specification file
-        into a dictionary with the output probabilities by
-        input
+    test_should_get_outputs_qubits_length
     """
     # given
-    specification_file_path = "test_resources/qram.spec.txt"
-    n_qubits = None
-    save_output = False
+    outputs_probabilities = [
+        { "1": .2, "10": .2, "101": .4, "11": .2 },
+        { "0": .5, "1": .5 }, { "11": .3, "1": .6, "0": .1 }
+    ]
 
     # when
-    output_probabilities_by_input = \
-        specification_parser.parse(
-            specification_file_path, n_qubits, save_output)
+    result = get_len_qubits_in_output(outputs_probabilities)
 
     # then
-    assert output_probabilities_by_input == {
-        '000': { '001': 1.0 },
-        '001': { '001': 1.0 },
-        '010': { '001': 0.24999999999999994,
-                  '010': 0.7500000000000001 },
-        '011': { '001': 0.7500000000000001,
-                  '010': 0.2499999999999999 },
-        '100': { '001':0.24999999999999994 ,
-                  '011': 0.7500000000000001 },
-        '101': { '001': 0.7500000000000001,
-                  '011': 0.2499999999999999 },
-        '110': { '000': 0.7500000000000001,
-                  '001': 0.24999999999999994 },
-        '111': { '000': 0.2499999999999999,
-                  '001': 0.7500000000000001 }
+    assert result == 3
+
+def test_should_get_input_qubits_length():
+    """
+    test_should_get_input_qubits_length
+    """
+    # given
+    inputs = [ "0", "1", "10", "11", "100" ]
+
+    # when
+    result = get_len_qubits_in_input(inputs)
+
+    #  then
+    assert result == 3
+
+def test_should_fix_the_length_of_qubits_in_parsed_outputs_probabilities_by_input():
+    """
+    test_should_fix_the_length_of_qubits_in_parsed_outputs_probabilities_by_input
+    """
+    # given
+    outputs_probabilities_by_input = {
+        "1": { "1": .2, "10": .2, "0": .4, "11": .2 },
+        "1001": { "0": .5, "1": .5 },
+        "11": { "11": .3, "1": .6, "0": .1 }
     }
 
-def test_should_parse_the_specification_file_with_n_qubits():
-    """
-    test should parse the valid example specification file
-        into a dictionary with the output probabilities by
-        input with provided n_qubits
-    """
-    # given
-    specification_file_path = "test_resources/qram.spec.txt"
-    n_qubits = 5
-    save_output = False
-
     # when
-    output_probabilities_by_input = \
-        specification_parser.parse(
-            specification_file_path, n_qubits, save_output)
+    result = fix_number_of_qubits(outputs_probabilities_by_input)
 
     # then
-    assert output_probabilities_by_input == {
-        '00000': { '00001': 1.0 },
-        '00001': { '00001': 1.0 },
-        '00010': { '00001': 0.24999999999999994,
-                  '00010': 0.7500000000000001 },
-        '00011': { '00001': 0.7500000000000001,
-                  '00010': 0.2499999999999999 },
-        '00100': { '00001':0.24999999999999994 ,
-                  '00011': 0.7500000000000001 },
-        '00101': { '00001': 0.7500000000000001,
-                  '00011': 0.2499999999999999 },
-        '00110': { '00000': 0.7500000000000001,
-                  '00001': 0.24999999999999994 },
-        '00111': { '00000': 0.2499999999999999,
-                  '00001': 0.7500000000000001 }
+    assert result == {
+        "0001": { "01": .2, "10": .2, "00": .4, "11": .2 },
+        "1001": { "00": .5, "01": .5 },
+        "0011": { "11": .3, "01": .6, "00": .1 }
     }
