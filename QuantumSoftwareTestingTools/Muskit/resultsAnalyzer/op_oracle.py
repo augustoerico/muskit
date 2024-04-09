@@ -22,16 +22,19 @@ def verify(
     with open(expected_outputs_by_input_file_path, 'r', encoding='utf-8') as file:
         expected_outputs_probabilities_by_input = simplejson.load(file)
 
-    total_counts_by_input = get_total_counts_by_input(
-        observed_outputs_counts_by_input)
-
     observed_outputs_counts_by_input = \
-        accumulate_results_by_input(
-            observed_outputs_counts_by_input,
-            measured_qubits_ids)
+        match_observed_inputs_with_spec(
+            accumulate_results_by_input(
+                observed_outputs_counts_by_input,
+                measured_qubits_ids),
+            expected_outputs_probabilities_by_input
+            )
 
     save_accumulated_observed_outputs(observed_outputs_counts_by_input,
                                       observed_outputs_by_input_file_path)
+
+    total_counts_by_input = get_total_counts_by_input(
+        observed_outputs_counts_by_input)
 
     expected_outputs_counts_by_input = \
         get_expected_outputs_counts_by_input(
@@ -39,12 +42,15 @@ def verify(
             total_counts_by_input
         )
 
-    results, wrong_outputs = calculate_chisquare_for_each_input(
+    save_expected_outputs_counts(expected_outputs_counts_by_input,
+                                 expected_outputs_by_input_file_path)
+
+    results = calculate_chisquare_for_each_input(
         observed_outputs_counts_by_input,
         expected_outputs_counts_by_input)
 
-    if len(wrong_outputs) > 0:
-        save_wrong_outputs_by_input(wrong_outputs, observed_outputs_by_input_file_path)
+    # if len(wrong_outputs) > 0:
+    #     save_wrong_outputs_by_input(wrong_outputs, observed_outputs_by_input_file_path)
     save_results(results, observed_outputs_by_input_file_path)
 
 def get_observed_outputs_counts_by_input(
@@ -68,6 +74,7 @@ def calculate_chisquare_for_each_input(
     """
     calculate the chi-square for each input
     """
+    results = []
     for input_value, observed_outputs_counts in \
         observed_outputs_counts_by_input.items():
         expected_outputs_counts = \
@@ -75,13 +82,14 @@ def calculate_chisquare_for_each_input(
                                                             #   for the same reason as [1]
         f_expected_outputs = list(expected_outputs_counts.values())
         f_observed_outputs = list(observed_outputs_counts.values())
-        print(f"<{input_value}>")
-        print(f_expected_outputs)
-        print(f_observed_outputs)
-        print('----------------')
         r = chisquare(f_exp=f_expected_outputs, f_obs=f_observed_outputs)
-        print(r)
-    return [], []
+        results = [
+            *results, {
+                "f_exp": f_expected_outputs,
+                "f_obs": f_observed_outputs,
+                "r": r 
+                }]
+    return results
 
 def get_expected_outputs_counts_by_input(
         expected_outputs_probabilities_by_input: dict,
@@ -98,6 +106,30 @@ def get_expected_outputs_counts_by_input(
                 total_counts_by_input[input_value])
         for input_value, expected_outputs_probabilities in \
             expected_outputs_probabilities_by_input.items()
+    }
+
+def match_observed_inputs_with_spec(
+        observed_outputs_counts_by_input: dict,
+        expected_outputs_probabilities_by_input: dict) -> dict:
+    """
+    match_observed_inputs_spec
+    """
+    sample_input_value_from_observed = list(
+        observed_outputs_counts_by_input.keys())[0]
+    sample_input_value_from_expected = list(
+        expected_outputs_probabilities_by_input.keys())[0]
+    if len(sample_input_value_from_expected) <= len(sample_input_value_from_observed):
+        matching_input_len = len(sample_input_value_from_expected)
+        return {
+            input_value[-matching_input_len:]: observed_outputs_counts
+            for input_value, observed_outputs_counts in \
+                observed_outputs_counts_by_input.items()
+        }
+    matching_input_len = len(sample_input_value_from_expected)
+    return {
+        input_value.zfill(matching_input_len): observed_outputs_counts
+        for input_value, observed_outputs_counts in \
+            observed_outputs_counts_by_input.items()
     }
 
 def get_expected_outputs_counts(
@@ -235,7 +267,7 @@ def save_results(results: List, observed_results_file_path: Path):
     file_name = f"{dirname(observed_results_file_path)}" \
         + f"/{observed_results_file_path.stem}.results.json"
     with open(file_name, 'w+', encoding="utf-8") as file:
-        simplejson.dump(results, file, ignore_nan=True, indent=4)
+        simplejson.dump(results, file, ignore_nan=True)
 
 def save_accumulated_observed_outputs(
         accumulated_observed_outputs,
@@ -247,4 +279,15 @@ def save_accumulated_observed_outputs(
         + f"/{observed_outputs_by_input_file_path.stem}.acc.json"
     with open(file_name, 'w+', encoding="utf-8") as file:
         simplejson.dump(accumulated_observed_outputs, file,
+                        ignore_nan=True, indent=4)
+
+def save_expected_outputs_counts(expected_outputs_counts_by_input: dict,
+                                 expected_outputs_by_input_file_path: Path):
+    """
+    Save expected results counts into JSON file
+    """
+    file_name = f"{dirname(expected_outputs_by_input_file_path)}" \
+        + f"/{expected_outputs_by_input_file_path.stem}.counts.json"
+    with open(file_name, 'w+', encoding="utf-8") as file:
+        simplejson.dump(expected_outputs_counts_by_input, file,
                         ignore_nan=True, indent=4)
