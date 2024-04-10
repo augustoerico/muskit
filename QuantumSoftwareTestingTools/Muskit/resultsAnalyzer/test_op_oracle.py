@@ -6,7 +6,8 @@ from op_oracle import add_zero_count_for_non_observed_outputs, \
     add_zero_probability_for_non_expected_outputs, \
     add_zero_probability_for_non_expected_outputs_by_input, \
     get_expected_outputs_counts, \
-    get_expected_outputs_counts_by_input
+    get_expected_outputs_counts_by_input, \
+    match_observed_inputs_with_spec
 
 def test_should_add_zero_count_for_non_observed_outputs():
     """
@@ -257,4 +258,42 @@ def test_should_get_expected_output_counts_by_input():
         "01": { "00": 15, "01": 50, "10": 0, "11": 25 },
         "10": { "00": 25, "01": 17, "10": 21, "11": 21},
         "11": { "00": 8, "01": 18, "10": 34, "11": 25 }
+    }
+
+def test_should_match_observed_inputs_with_spec():
+    """
+    test_should_match_observed_inputs_with_spec
+    """
+    # given
+    observed_outputs_by_input = {
+        "0000000": { "00": 100 },
+        "0000001": { "00": 100 },
+        "0000011": { "00": 100 },
+        "0001000": { "00": 22, "01": 78 },
+        "1011000": { "11": 73, "10": 27 },
+        "1011001": { "10": 18, "11": 82 },
+        "0011100": { "00": 81, "11": 19 }
+    }
+    spec = {
+        "00000": { "01": 1. },
+        "00001": { "01": 1. },
+        "00011": { "01": .75, "10": .25 },
+        "01000": { "01": .75, "10": .25 },
+        "01001": { "01": .25, "10": .75 }, # not observed
+        "11000": { "00": .25, "01": .75 },
+        "11001": { "00": .75, "01": .25 },
+        "11100": { "00": .25, "11": .75 },
+        "11111": { "00": 1. } # not observed
+    }
+
+    # when
+    result = match_observed_inputs_with_spec(observed_outputs_by_input, spec)
+
+    # then
+    assert result == {
+        "00000": { "00": 100 },
+        "00001": { "00": 100 },
+        "00011": { "00": 100 },
+        "01000": { "00": 22, "01": 78 },
+        "11100": { "00": 81, "11": 19 }
     }
