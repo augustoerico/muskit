@@ -8,7 +8,7 @@ from typing import List, Tuple
 from scipy.stats import chisquare
 import simplejson
 
-from results_accumulator import accumulate_results_by_input
+from results_accumulator import get_accumulated_results_by_input
 
 def calculate_chi_square(
         expected_outputs_by_input_file_path: Path,
@@ -22,11 +22,17 @@ def calculate_chi_square(
     with open(expected_outputs_by_input_file_path, 'r', encoding='utf-8') as file:
         expected_outputs_probabilities_by_input = simplejson.load(file)
 
+    accumulated_results_by_input = \
+        get_accumulated_results_by_input(
+                observed_outputs_counts_by_input,
+                measured_qubits_ids)
+    save_accumulated_observed_outputs(
+        accumulated_results_by_input,
+        observed_outputs_by_input_file_path)
+
     observed_outputs_counts_by_input = \
         match_observed_inputs_with_spec(
-            accumulate_results_by_input(
-                observed_outputs_counts_by_input,
-                measured_qubits_ids),
+            accumulated_results_by_input,
             expected_outputs_probabilities_by_input
             )
 
@@ -52,6 +58,7 @@ def calculate_chi_square(
     # if len(wrong_outputs) > 0:
     #     save_wrong_outputs_by_input(wrong_outputs, observed_outputs_by_input_file_path)
     save_results(results, observed_outputs_by_input_file_path)
+    return results
 
 def get_observed_outputs_counts_by_input(
         observed_outputs_counts_by_input: dict,
@@ -60,7 +67,7 @@ def get_observed_outputs_counts_by_input(
     """
     get_observed_outputs_counts_by_input
     """
-    return accumulate_results_by_input(
+    return get_accumulated_results_by_input(
         remove_unexpecteds_by_input(
             observed_outputs_counts_by_input, \
             expected_outputs_probabilities_by_input),
@@ -74,22 +81,42 @@ def calculate_chisquare_for_each_input(
     """
     calculate the chi-square for each input
     """
+    results_by_input = {}
+    for input_value, expected_outputs_counts in \
+        expected_outputs_counts_by_input.items():
+        # [TODO] check WO
+        observed_outputs_counts = \
+            observed_outputs_counts_by_input.get(input_value)
+        if observed_outputs_counts is not None:
+            results_by_input[input_value] = \
+                calculate_chisquare_from_counts(
+                    expected_outputs_counts, observed_outputs_counts)
+    return results_by_input
+
+def calculate_chisquare_from_counts(
+        expected_outputs_counts: dict,
+        observed_outputs_counts: dict):
+    """
+    calculate_chisquare_from_counts
+    """
+    f_exp = []
+    f_obs = []
     results = []
-    for input_value, observed_outputs_counts in \
-        observed_outputs_counts_by_input.items():
-        expected_outputs_counts = \
-            expected_outputs_counts_by_input[input_value]   # [FIXME] will raise an exception
-                                                            #   for the same reason as [1]
-        f_expected_outputs = list(expected_outputs_counts.values())
-        f_observed_outputs = list(observed_outputs_counts.values())
-        r = chisquare(f_exp=f_expected_outputs, f_obs=f_observed_outputs)
-        results = [
-            *results, {
-                "input": input_value,
-                "f_exp": f_expected_outputs,
-                "f_obs": f_observed_outputs,
-                "r": r 
-                }]
+    for output, exp_count in expected_outputs_counts.items():
+        f_exp = [ *f_exp, exp_count ]
+        f_obs = [ *f_obs, observed_outputs_counts.get(output, 0) ]
+    statistic, pvalue = chisquare(f_obs, f_exp)
+    if statistic == .0 and pvalue is None:
+        # exp and obs are equal
+        pvalue = .0
+    elif statistic == 100. and pvalue is None:
+        pvalue = 1.
+    results = [ *results, {
+        "exp": expected_outputs_counts,
+        "obs": observed_outputs_counts,
+        "f_exp": f_exp, "f_obs": f_obs,
+        "statistic": statistic, "pvalue": pvalue
+        }]
     return results
 
 def get_expected_outputs_counts_by_input(
@@ -117,21 +144,24 @@ def match_observed_inputs_with_spec(
     """
     sample_input_value_from_observed = list(
         observed_outputs_counts_by_input.keys())[0]
+    obs_input_len = len(sample_input_value_from_observed)
+
     sample_input_value_from_expected = list(
         expected_outputs_probabilities_by_input.keys())[0]
-    if len(sample_input_value_from_expected) <= len(sample_input_value_from_observed):
-        matching_input_len = len(sample_input_value_from_expected)
-        return {
-            input_value[-matching_input_len:]: observed_outputs_counts
-            for input_value, observed_outputs_counts in \
-                observed_outputs_counts_by_input.items()
-        }
-    matching_input_len = len(sample_input_value_from_expected)
-    return {
-        input_value.zfill(matching_input_len): observed_outputs_counts
-        for input_value, observed_outputs_counts in \
-            observed_outputs_counts_by_input.items()
-    }
+    exp_input_len = len(sample_input_value_from_expected)
+
+    result = {}
+    if exp_input_len <= obs_input_len:
+        for input_value in expected_outputs_probabilities_by_input.keys():
+            obs_input = input_value.zfill(obs_input_len)
+            if obs_input in observed_outputs_counts_by_input:
+                obs_outputs = observed_outputs_counts_by_input[obs_input]
+                result[input_value] = obs_outputs
+        return result
+
+    message = "not implemented: observed inputs have less qubits " \
+        + "than specification"
+    raise NotImplementedError(message)
 
 def get_expected_outputs_counts(
         expected_outputs_probabilities: dict,
@@ -292,3 +322,20 @@ def save_expected_outputs_counts(expected_outputs_counts_by_input: dict,
     with open(file_name, 'w+', encoding="utf-8") as file:
         simplejson.dump(expected_outputs_counts_by_input, file,
                         ignore_nan=True, indent=4)
+
+def debug():
+    """
+    debug
+    """
+    expected_outputs_by_input_file_path = Path('E:\\2\\muskit\\QuantumSoftwareTestingTools\\Muskit\\' \
+        + 'ExperimentalData\\QRAM\\QR_test_oracle.spec.json')
+    observed_outputs_by_input_file_path = Path('E:\\2\\muskit\\QuantumSoftwareTestingTools\\Muskit\\' \
+        + 'ExperimentalData\\QRAM\\json_results\\1AddGate_x_inGap_1_.json')
+    measured_qubits_ids = [0, 1]
+    calculate_chi_square(
+        expected_outputs_by_input_file_path,
+        observed_outputs_by_input_file_path,
+        measured_qubits_ids)
+
+if __name__ == "__main__":
+    debug()

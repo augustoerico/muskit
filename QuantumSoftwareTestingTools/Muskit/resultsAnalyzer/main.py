@@ -69,6 +69,20 @@ def main():
   observedFile = resultCleaner(results, saveDirectory)
   chiSquare.validation(observedFile, expectedFile)
 
+def main_cli():
+  """
+  Rewires main() to use pre-set args
+  """
+  results_file_path = 'E:\\2\\muskit\\QuantumSoftwareTestingTools\\Muskit\\' \
+    + 'ExperimentalData\\QRAM\\results.txt'
+  spec_file_path = 'E:\\2\\muskit\\QuantumSoftwareTestingTools\\Muskit\\' \
+    + 'ExperimentalData\\QRAM\\QR_test_oracle.txt'
+  save_validation_dir_path = 'E:\\2\\muskit\\QuantumSoftwareTestingTools\\Muskit\\' \
+    + 'ExperimentalData\\QRAM'
+  
+  observed_file = resultCleaner(results_file_path, save_validation_dir_path)
+  chiSquare.validation(observed_file, spec_file_path)
+
 def debug_results_cleaner():
   """Rewires main() for easier debug"""
   results_file_path = 'E:\\2\\muskit\\QuantumSoftwareTestingTools\\Muskit\\ExperimentalData\\QRAM\\results.txt'
@@ -78,4 +92,5 @@ def debug_results_cleaner():
 
 if __name__ == "__main__":
   # main()
-  debug_results_cleaner()
+  main_cli()
+  # debug_results_cleaner()

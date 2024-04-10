@@ -4,7 +4,7 @@ results accumulator accumulates the results counts depending
 """
 from typing import List
 
-def accumulate_results_by_input(
+def get_accumulated_results_by_input(
     parsed_results_by_input: dict,
     qubits_ids: List[int],  # [TODO] should raise exception if len(qubits) > len(output)
                             #   => measuring more qubits than what the circuit has
