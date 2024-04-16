@@ -1,6 +1,7 @@
 """
 Tests for the results_parser module
 """
+from pathlib import Path
 import pytest
 import results_parser
 
@@ -54,7 +55,6 @@ def test_should_extract_counts_by_input_from_results_line_with_n_qubits():
 
     # then
     assert counts_by_input == { '0001': { '1101': 69, '1001': 31 } }
-
 
 def test_should_add_counts_by_id_into_an_empty_output_dictionary():
     """
@@ -156,7 +156,7 @@ def test_should_break_results_file_into_smaller_sections():
         }
     }
 
-def test_should_parse_results_file_into_json_file():
+def test_should_parse_results_file_into_json_files():
     """
     test should parse a valid results file into multiple results json files,
         one for each mutant
@@ -168,5 +168,29 @@ def test_should_parse_results_file_into_json_file():
     results_parser.parse(results_file_path)
 
     # then
-    assert True
+    # assert no exception was raised during the process
+    #   and manually check test_resources/results_json folder
     # [TODO] make better assertions
+    assert True
+
+def test_should_parse_results_into_json_files_given_the_output_dir():
+    """
+    test should parse a valid results file into multiple results json files,
+        one for each mutant, in the specified output dir `my_dir`
+    """
+    # given
+    results_file_path = Path("test_resources/example_results.txt")
+    n_qubits = None # do not define the qubits length
+    output_dir = Path("test_resources/my_dir/my_sub_dir")
+
+    # when
+    results_parser.parse(
+        results_file_path,
+        n_qubits=n_qubits,
+        output_dir=output_dir)
+
+    # then
+    # assert no exception was raised during the process
+    #   and manually check test_resources/my_dir/results_json folder
+    # [TODO] make better assertions
+    assert True
