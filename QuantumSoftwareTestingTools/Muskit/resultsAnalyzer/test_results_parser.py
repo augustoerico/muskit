@@ -168,8 +168,8 @@ def test_should_parse_results_file_into_json_files():
     results_parser.parse(results_file_path)
 
     # then
-    # assert no exception was raised during the process
-    #   and manually check test_resources/results_json folder
+    # assert no exception was raised during the process and manually check
+    #   `test_resources/results_json` folder
     # [TODO] make better assertions
     assert True
 
@@ -190,7 +190,7 @@ def test_should_parse_results_into_json_files_given_the_output_dir():
         output_dir=output_dir)
 
     # then
-    # assert no exception was raised during the process
-    #   and manually check test_resources/my_dir/results_json folder
+    # assert no exception was raised during the process and manually check
+    #   `test_resources/my_dir/my_sub_dir/results_json` folder
     # [TODO] make better assertions
     assert True
