@@ -138,3 +138,21 @@ The auditing steps are:
 }
 ```
 - Compare audit results with `testResults.txt`. For each line in `testResult.txt`, it evaluates if the conclusion is correct or not and stores into `audit_results.json` (which contains all evaluations) and `audit_results_wrong.json`, that contains only the results that diverge from the original
+
+## Usage 🚧[WIP]🚧
+
+This should be wrapped into a single CLI call, but for now each step needs to be executed with a command.
+Assuming you are running the commands from `QuantumSoftwareTestingTools/Muskit/audit`
+
+### Step 1: parse QP Specification
+
+```shell
+🐚
+```
+
+### Step 2: parse results.txt
+
+Example: parsing the results from QRAM program
+```shell
+python ../resultsAnalyzer/cli.py parse-results --output-dir QRAM ../ExperimentalData/QRAM/results.txt
+```

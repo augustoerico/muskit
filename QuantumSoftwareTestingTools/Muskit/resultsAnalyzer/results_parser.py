@@ -3,13 +3,15 @@ Module to parse results file produced by Muskit.execute
 """
 import ast
 import json
-from os import mkdir
-from os.path import basename, dirname, exists
+from os.path import basename, dirname
 from pathlib import Path
 from typing_extensions import Optional
 
 
-def parse(file_path: Path, n_qubits: Optional[int] = None) -> None:
+def parse(
+        file_path: Path,
+        n_qubits: Optional[int] = None,
+        output_dir: Path = None) -> None:
     """
     parse results file into json data
     """
@@ -18,9 +20,10 @@ def parse(file_path: Path, n_qubits: Optional[int] = None) -> None:
     counts_by_mutant_by_input = \
         break_results_into_smaller_sections(file_path, n_qubits)
 
-    output_dir = f"{dirname(file_path)}/json_results"
-    if not exists(output_dir):
-        mkdir(output_dir)
+    if output_dir is None:
+        output_dir = Path(f"{dirname(file_path)}")
+    output_dir /= 'results_json' # append `results_json` to path
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     for mutant_file_path, counts_by_input in counts_by_mutant_by_input.items():
         results_file_name = str(basename(mutant_file_path)) \
