@@ -21,7 +21,8 @@ def parse(
         break_results_into_smaller_sections(file_path, n_qubits)
 
     if output_dir is None:
-        output_dir = Path(f"{dirname(file_path)}/results_json")
+        output_dir = Path(f"{dirname(file_path)}")
+    output_dir /= 'results_json' # append `results_json` to path
     output_dir.mkdir(parents=True, exist_ok=True)
 
     for mutant_file_path, counts_by_input in counts_by_mutant_by_input.items():
